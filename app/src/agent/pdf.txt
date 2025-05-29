@@ -1,0 +1,1283 @@
+                                                   Knowledge-Based Systems 295 (2024) 111737
+                                                   Contents lists available at ScienceDirect                                   Knowledge_Based
+                                                                                                                                   SYSTEMS
+                                                            Knowledge-Based Systems
+EL SEVIER                                       journal homepage: www.elsevier.com/locate/knosys
+Artificial Protozoa Optimizer (APO): A novel bio-inspired metaheuristic
+algorithm for engineering optimization
+Xiaopeng Wang a, Václav Snášel a,∗, Seyedali Mirjalili b, Jeng-Shyang Pan c, Lingping Kong a,
+Hisham A. Shehadeh d
+a Faculty of Electrical Engineering and Computer Science, VŠB-Technical University of Ostrava, Ostrava, 70800, Czech Republic
+b Centre for Artificial Intelligence Research and Optimisation, Torrens University Australia, Brisbane, 4006, Australia
+c School of Artificial Intelligence, Nanjing University of Information Science and Technology, Nanjing, 210044, China
+dCollege of Computer Science and Informatics, Amman Arab University, Amman, 11953, Jordan
+A R T I C L E     I N F O                    A B S T R A C T
+Keywords:                                    This study proposes a novel artificial protozoa optimizer (APO) that is inspired by protozoa in nature. The
+Metaheuristic algorithm                      APO mimics the survival mechanisms of protozoa by simulating their foraging, dormancy, and reproductive
+Artificial protozoa optimizer                behaviors. The APO was mathematically modeled and implemented to perform the optimization processes of
+Constrained optimization                     metaheuristic algorithms. The performance of the APO was verified via experimental simulations and compared
+Engineering design                           with 32 state-of-the-art algorithms. Wilcoxon signed-rank test was performed for pairwise comparisons of the
+Image segmentation                           proposed APO with the state-of-the-art algorithms, and Friedman test was used for multiple comparisons.
+                                             First, the APO was tested using 12 functions of the 2022 IEEE Congress on Evolutionary Computation
+                                             benchmark. Considering practicality, the proposed APO was used to solve five popular engineering design
+                                             problems in a continuous space with constraints. Moreover, the APO was applied to solve a multilevel
+                                             image segmentation task in a discrete space with constraints. The experiments confirmed that the APO could
+                                             provide highly competitive results for optimization problems. The source codes of Artificial Protozoa Optimizer
+                                             are publicly available at https://seyedalimirjalili.com/projects and https://ww2.mathworks.cn/matlabcentral/
+                                             fileexchange/162656-artificial-protozoa-optimizer.
+1. Introduction                                                           of the computational evaluation costs, they can be divided into inexpen-
+                                                                          sive and expensive optimizations. Furthermore, as the environment of
+   The optimization problem exists in many fields such as signal pro-     optimization problems changes over time (such as changes in objective
+cessing, image processing, pattern recognition, mechanical design, pro-   functions, decision variables, or constraints), optimization problems
+duction scheduling, and automatic control [1–3]. Optimization refers      can also be divided into static and dynamic optimization problems.
+to the search for optimal solution(s) in a decision space. In general,    With the rapid economic development in recent decades, the complex-
+it maximizes or minimizes one or more objectives subject to certain       ity of solving problems has increased in the scientific and industrial
+constraints. In practice, minimizing cost, risk, and time, or maximizing  fields, and the need for optimization technologies has become more
+efficiency, profit, and quality are common optimization problems. The     significant than ever. The mathematical optimization technique is an
+properties of the optimization problems can be classified as follows [4,  exact method and used to be the only tool for solving optimization
+5]. Depending on the type of decision space, they can be classified       problems. However, this method has certain limitations. The first is
+into two categories: continuous and discrete optimization problems.       premature convergence, which refers to local optima entrapment. The
+Considering the constraints, they can be divided into unconstrained       second limitation is that certain algorithms, such as gradient-based
+and constrained optimizations. In terms of the number of optima, they     algorithms, require derivation and convexity restrictions. However,
+can be classified as unimodal and multimodal optimization problems.       most problems solved in practical applications are multimodal, non-
+Moreover, the classification distinguishes between single-, multi-, and   linear, and nondifferentiable. Moreover, high computational costs are
+many-objective optimizations according to the number of objectives.       exhibited when mathematical optimization algorithms are used to solve
+Based on the number of decision variables, they can be divided into       non-deterministic polynomial-time (NP)-hard problems, where NP-hard
+low, medium, high dimensions, and large-scale optimizations. In terms
+  ∗  Corresponding author.
+     E-mail address: vaclav.snasel@vsb.cz (V. Snášel).
+https://doi.org/10.1016/j.knosys.2024.111737
+Received 9 January 2024; Received in revised form 24 March 2024; Accepted 1 April 2024
+Available online 13 April 2024
+0950-7051/© 2024 The Author(s). Published by Elsevier B.V. This is an open access article under the CC BY license (http://creativecommons.org/licenses/by/4.0/).
+---
+X. Wang et al.
+implies ‘‘at least as hard as the hardest problem in NP’’. These prob-
+lems render the mathematical optimization technique ineffective for
+solving practical problems. Another increasingly popular technique is
+the metaheuristic algorithm. ‘‘Meta’’ and ‘‘heuristic’’ originate from
+Greek words. ‘‘Meta’’ implies ‘‘upper-level methodology’’ and ‘‘heuris-
+tic’’ means ‘‘to discover’’, ‘‘to find’’, or ‘‘to know’’. A metaheuristic
+algorithm can be defined as an upper-level general methodology for
+solving optimization problems [6]. Unlike the exact method, the meta-
+heuristic algorithm is designed to obtain acceptable solutions using
+an approximate method. The advantages of metaheuristic algorithms
+are as follows. First, the black-box concept considers only the inputs
+and outputs of optimization. Second, they can solve large problems,
+perform faster calculations, and obtain robust results. Moreover, their
+frameworks and concepts are simple, easy to implement, and flexi-
+ble. Therefore, metaheuristic algorithms are particularly suitable for
+optimization problems that are challenging for conventional methods.
+     Metaheuristic algorithms are generally classified as S-metaheuristics
+(single solution) and P-metaheuristics (population solutions) [7]. S-
+metaheuristics begin with a single random solution and iteratively
+improves it in the decision space. These algorithms exhibit low com-
+putational cost and require fewer function evaluations, but suffer from
+premature convergence, leading to trapping in the local optima. Well-
+known algorithms in S-metaheuristics include simulated annealing [8],
+tabu search [9], hill climbing [10], iterated local search [11], and vari-
+able neighborhood search [12]. Unlike S-metaheuristic techniques, P-
+metaheuristic algorithms iteratively enhance a population solution. The
+process begins with the initialization of a population. Subsequently,
+a new population is generated based on the current population. Ulti-
+mately, the integration of these two populations leads to the subsequent
+generation of population through diverse selection schemes. The pro-
+cess is terminated, and the discovered optima are output when a prede-
+fined condition is satisfied (convergence accuracy, maximum iterations,
+or maximum function evaluations). In contrast to S-metaheuristics,
+in terms of performance, P-metaheuristics have a higher ability to
+avoid local optima. Furthermore, candidate solutions share information
+during optimization, which helps in solving different difficulties in
+the decision space. However, high computational cost and additional
+functional evaluations are two disadvantages of P-metaheuristics.
+             Biology, physical phenomena, and human behavior usually moti-
+vate P-metaheuristics. Several popular P-metaheuristic algorithms are
+primarily classified into evolution-, swarm-, physics-, and human-based
+algorithms. Evolution-based algorithms are inspired by biological evo-
+lution. The most popular algorithm is the genetic algorithm (GA) [13]
+proposed by Holland in 1975. It was inspired by Darwin’s theory and
+introduced selection, crossover, and mutation operations to guide the
+optimization process. In 1995, Storn and Price proposed differential
+evolution (DE) [14], which was derived from the genetic annealing
+algorithm [15], where mutation, crossover, and selection operations
+were integrated for optimization. In 2013, Pinar presented a back-
+tracking search algorithm (BSA) [16]. The strategy of the BSA is to
+
+use a memory population (previous experience) to generate a trial
+population, including a new crossover and mutation. Rao proposed a
+simple algorithm called Jaya (which means victory in Sanskrit) [17] in
+2016. Jaya updates the population in a significantly simple manner,
+that is, close to the best solution and far from the worst solution.
+Swarm-based algorithms draw inspiration from the social behaviors
+observed in biological swarms. In 1995, Kennedy and Eberhart pio-
+neered the widely recognized particle swarm optimization (PSO) [18].
+In PSO, which is inspired by flocks of birds or schools of fish, the
+significance of both the personal best (called ‘‘pbest’’) and global best
+(called ‘‘gbest’’) is crucial in directing the population. Mirjalili pro-
+posed the grey wolf optimizer (GWO) [19] in 2014. The GWO was
+inspired by from the leadership and hunting strategies observed in
+grey wolves. This algorithm introduced four wolf hierarchies: alpha,
+beta, delta, and omega, along with three hunting behaviors: searching,
+                                                                      2
+                               Knowledge-Based Systems 295 (2024) 111737
+encircling, and attacking. In 2016, he also proposed a whale optimiza-
+tion algorithm (WOA) [20]. The social behavior and spiral bubble-net
+feeding strategy of humpback whales were simulated. Song et al.
+advocated the phasmatodea population evolution (PPE) algorithm [21]
+in 2021. The authors considered the competitive behavior, population
+growth, convergent evolution, and path dependence in stick insects.
+Evolutionary trends guide the population updates to create the next
+generation. Physics-based algorithms are motivated by the principles
+of physics, chemistry, and mathematics. A well-known algorithm is
+the gravitational search algorithm (GSA) [22]. In 2009, Rashedi con-
+ceptualized candidate solutions as an assembly of masses, where the
+interaction among these solutions is governed by Newtonian gravity
+and motion laws. This interaction dictates the creation of subsequent
+generations. Mirjalili developed multi-verse optimizer (MVO) [23] in
+2015. The MVO incorporates concepts from cosmology by introducing
+white holes, black holes, and wormholes. In this framework, individ-
+ual candidate solutions are regarded as distinct universes, with each
+variable representing an object within that universe. The movement of
+the population is directed by the repulsion, attraction, and transmission
+interactions among the holes. In 2016, he also proposed the sine cosine
+algorithm (SCA) [24]. The SCA randomly initializes multiple candidate
+solutions and constructs mathematical models based on sine and cosine
+functions to regulate their movement either outward or toward the best
+solution. In 2021, Abualigah introduced the arithmetic optimization
+algorithm (AOA) [25], which implements optimization by utilizing
+addition, subtraction, multiplication, and division operations. Human-
+inspired algorithms are influenced by human social behavior. A notable
+instance is teaching–learning-based optimization (TLBO) [26], which
+was introduced by Rao in 2011. In the TLBO, solutions are viewed as
+a collective of learners, encompassing both teachers and students. The
+algorithm employs ‘‘Teacher Phase’’ and ‘‘Learner Phase’’ operations to
+boost the population. During the ‘‘Teacher Phase’’, students learn from
+the teacher, whereas the ‘‘Learner Phase’’ involves learning through
+interactions among students. In 2019, Zhao described supply—demand-
+based optimization (SDO) [27], a proposal inspired by the economic
+principles of supply and demand. Mathematical modeling is based on
+the interplay between consumer demand and producer supply. Kaveh
+presented an art-motivated stochastic paint optimizer (SPO) [28] in
+2020. The SPO treats the decision space as a canvas, where the pop-
+ulation search is driven by four basic color combinations to uncover
+the most beautiful combination pattern. Student psychology-based op-
+timization (SPBO) [29] was proposed by Das in 2020. This model is
+based on the strategy that students work harder to be at the top of their
+class. This paper outlines four student categories within a class: best,
+good, and average students, and students trying to improve randomly.
+The efforts of the students will result in an increase in their overall
+grade. Numerous other P-metaheuristics are worth acknowledging, in-
+cluding ant colony optimization [30], gaining-sharing knowledge-based
+algorithm [31], dwarf mongoose optimization [32], nutcracker opti-
+mization algorithm [33], snake optimizer (SO) [34], and harris hawks
+optimizer (HHO) [35], quadratic interpolation optimization (QIO) [36],
+and Fick’s law optimization [37].
+Metaheuristic algorithms are inspired by various natural phenom-
+ena and operate in different ways. However, the two common con-
+cepts are exploration (diversification) and exploitation (intensification).
+In [38], Eiben and Schippers state that ‘‘exploration and exploitation
+are the two cornerstones of problem solving by search’’. Exploration
+pertains to the capability of generating diverse solutions to explore the
+global space, whereas exploitation emphasizes the ability to conduct
+a local search around promising solutions. Exploration and exploita-
+tion are conflicting components, and the preference for exploration
+inevitably leads to the degradation of exploitation, and vice versa.
+Despite its significance, a specific guideline has not been proposed for
+achieving this balance. Consequently, determining the right balance
+between exploration and exploitation remains a challenging task. ‘‘No
+Free Lunch’’ [39] theory asserts that no heuristic can consistently
+---
+X. Wang et al.
+       outperform others across all possible problems. Even with a purely
+         random search, the average performance will be comparable on all
+ problems for different heuristics. This implies that an algorithm may be
+    effective for specific problems; however, its performance may degrade
+       when applied to different problems. Consequently, this theorem has
+   opened up the field and sparked significant interest among researchers
+      proposing new algorithms. The primary research and contributions of
+this paper are as follows.
+    •  A new bio-inspired artificial protozoa optimizer (APO) is designed
+      to model the survival behavior of protozoa.
+    •          The APO algorithm mimics foraging, dormancy, and reproduc-
+             tion. Autotrophic foraging and dormancy contribute to explo-
+             ration, however heterotrophic foraging and reproduction con-
+      tribute to exploitation.
+    • The APO   is implemented   and  evaluated  under  the CEC2022
+             benchmark. The experimental results verified that the APO is
+      superior to 32 state-of-the-art algorithms.
+    •  The effectiveness of APO is tested by challenging real-world prob-
+          lems, including five engineering designs and a multilevel image
+      segmentation task.
+  The remainder of this paper is structured as follows. In Section 2, the
+     proposed APO algorithm is introduced. Section 3 presents simulations
+      under the CEC2022 benchmark. Section 4 highlights certain practical
+    applications, including five engineering designs and a multilevel im-
+       age segmentation task. Finally, Section 5 summarizes the study and
+proposes potential research directions.
+
+2. Artificial protozoa optimizer
+
+       In this section, we introduce the APO algorithm, beginning with an
+    elucidation of its inspiration. Subsequently, we propose mathematical
+     models for simulating protozoa. Finally, a comprehensive analysis of
+the proposed algorithm is presented.
+
+2.1. Inspiration
+
+       The investigation of various biological phenomena demonstrates the
+     distinct advantages of microorganisms. Bacteria, algae, and protozoa
+         within microorganisms perform analogous functions to that of the
+        organs found in higher plants and animals, which are accomplished
+   through specialized structures known as ‘‘organelles’’. These microor-
+   ganisms display fundamental life characteristics including metabolism,
+reproduction, genetic continuity, variability, and adaptation to environ-
+   mental stimuli. Microorganisms are typically utilized more efficiently
+      than higher organisms because of their simpler organization and low
+complexity [40].
+        In this paper, the mentioned protozoa refer to the representative
+   euglena within the flagellates. The name ‘‘euglena’’ is derived from a
+    Greek word meaning ‘‘eyeball organism’’. It is a single-celled proto-
+  zoan or, more precisely, an ‘‘algal flagellate’’. More than 250 species
+     of euglena have been identified. Euglena species primarily reside in
+      freshwater environments and often form prolific blooms in ponds and
+      ditches. The abundant growth of this species imparts a green or red
+tint to the water surface. Euglena cells range in size from 15 to 500 μm,
+  and their shapes vary from nearly spherical to nearly cylindrical. Most
+       euglena species are green because of the presence of chlorophyll a
+       and b in their chloroplasts [41,42]. Fig. 1 shows a spindle-shaped
+   euglena and its prominent organelles containing flagellum, photorecep-
+  tor, nucleus, mitochondria, chloroplasts, stigma (eyespot), contractile
+    vacuole, Golgi apparatus, endoplasmic reticulum, stored carbohydrate,
+      and pellicles [43]. Euglena has two flagella that are rooted in its
+   basal body. One short flagellum does not protrude from the cell, while
+     the other is long enough to protrude from the ‘‘gullet’’ or pharynx.
+   The euglena performs spiral motions by ‘‘beating’’ the long flagellum.
+                                                                       3
+                                  Knowledge-Based Systems 295 (2024) 111737
+Notably, euglena exhibits both plant- and animal-like characteristics.
+This implies that it can get the nutrition to survive by functioning as an
+autotrophic (mineral) or a heterotrophic (organic substance) organism.
+When the euglena is under unfavorable environmental conditions, it
+forms a protective wall around itself such as a cyst and becomes
+dormant until the surrounding environment improves. For offspring
+production, euglena reproduces through asexual reproduction by the
+process of binary fission, that is, it splits into two through longitudinal
+cell division. Euglena can be used for environmental biomediation
+and exhibits significant potential for use in biomedicine. First, euglena
+can be used as an indicator of environmental health and assess water
+quality. It is highly resistant to heavy metals and can be used to restore
+water contaminated by radioactive elements. Moreover, euglena con-
+tains a toxin called euglenophycin, which exhibits anticancer activity.
+It is also a source of single-cell proteins and can be used in a variety of
+drugs, such as anti-hypertensive, anti-gout, and anti-liver cancer drugs.
+Finally, euglena demonstrates potential for use in commercial products
+such as dietary supplements, food preservatives, and cosmetics [44].
+The foraging, dormancy, and reproductive behaviors of euglena are
+further described based on mathematical models in the next subsection.
+   • Foraging
+      Euglena absorbs the nutrients essential for its survival through both
+autotrophic and heterotrophic mechanisms. Euglena performs photo-
+synthesis similar to plants, using chloroplasts to produce carbohydrates
+for energy. Phototaxis is a behavioral response of the euglena to light
+stimuli, which enables it to move toward or away from light. The
+perception of light is considered to be the basis of phototaxis. Eu-
+glena possesses an organelle known as the eyespot, which consists
+of carotenoid pigment granules. The eyespot is itself not sensitive to
+light and functions as a filter for sunlight, permitting only specific
+wavelengths of light to reach the photoreceptor at the base of the
+flagellum. At low irradiance, the euglena swims spirally toward the
+light source. However, the euglena moves away from the light source
+under high irradiance to prevent the destruction of pigments and
+chloroplasts. For euglena, the threshold for switching from positive
+to negative phototaxis has been investigated to be between 10 and
+100 W∕m2. This indicates that the euglena can self-orient to locate suit-
+able light conditions for photosynthesis. Thus, euglena exhibits positive
+phototaxis under low light and negative phototaxis under intense light.
+This causes it to congregate in suitable habitats for survival. In the
+dark, euglena exhibits animal-like behavior by absorbing organic mat-
+ter through phagocytosis, including substances such as carbohydrates,
+peptone, acetate, and beef extract. Euglena differs from other plant cells
+because it lacks a rigid cellulose wall. Instead, it features a flexible
+pellicle capable of free deformation. Through osmotrophy, euglena can
+directly absorb nutrients from the surrounding environment [45,46].
+
+   • Dormancy
+
+        Organisms survive in various ways under different stresses, such as
+environmental pollution, temperature changes, or a lack of food. Some
+animals migrate to reduce environmental stress, whereas others avoid
+adverse situations by changing their biological behavior. In response
+to unfavorable conditions, euglena can spray mucus subcutaneously,
+forming a protective mucilaginous capsule called cyst. During this
+period, the euglena enters a state of suspended animation (dormancy)
+until the surrounding environmental conditions become more con-
+ducive. The original cell morphs into ovoid, elliptical, and spherical
+shapes, and its flagella disappear. Euglena transitions from a unicellular
+motile organism to a non-motile mucus colony. In this suspended
+animation, the metabolism of the euglena slows down, resulting in
+energy conservation and reduced reliance on the external environment.
+Dormancy is an adaptive capability of euglena to effectively respond to
+environmental stress [47].
+---
+X. Wang et al.                                                                                                                  Knowledge-Based Systems 295 (2024) 111737
+                                                                                           nucleus_             nucleolus
+                                                                  mitochondrion
+                            flagellum                       chloroplasts                    Ako
+                                       stigma (eyespot)_
+                                                                                                                     stored carbohydrate
+                                                                  00                                           endoplasmic reticulum
+                                                                                                Golgi apparatus
+                                            photoreceptor                 contractile vacuole
+                                                             Fig. 1. Euglena cell showing the main organelles.
+                                      Table 1
+                                      Lowercase indicates a scalar parameter and uppercase indicates a vector.
+                                       𝑝𝑠                      Population size.
+                                       𝑑𝑖𝑚                    Number of decision variables.
+                                       𝑑𝑖                      Dimension index, 𝑑𝑖 ∈ {1,2,…, 𝑑𝑖𝑚}.
+                                       𝑛𝑝                      Number of neighbor pairs.
+                                       𝑓                        Foraging factor.
+                                       𝑤𝑎                      Weight factor in autotroph.
+                                       𝑤ℎ                       Weight factor in heterotroph.
+                                       𝑝𝑓                      Proportion fraction of dormancy and reproduction.
+                                       𝑝𝑎ℎ                     Probability of autotrophic and heterotrophic behavior.
+                                       𝑝𝑑𝑟                    Probability of dormancy and reproduction.
+                                       𝑟𝑎𝑛𝑑                  Random number in the range [0,1].
+                                       𝑖𝑡𝑒𝑟                  Current iteration.
+                                       𝑖𝑡𝑒𝑟𝑚𝑎𝑥            Maximum iteration.
+                                       𝑋𝑖                      𝑖th protozoan.
+                                       𝑋𝑚𝑖𝑛                  Lower-bound vector.
+                                       𝑋𝑚𝑎𝑥                  Upper-bound vector.
+                                       𝑀𝑓                      Mapping vector in foraging.
+                                       𝑀𝑟                      Mapping vector in reproduction.
+                                       𝐷𝑟𝑖𝑛𝑑𝑒𝑥            Index vector in dormancy and reproduction.
+                                       𝑅𝑎𝑛𝑑                  Random vector with elements in [0,1].
+                                       ⌈⋅⌉                       Ceiling function.
+                                       ⌊⋅⌋                       Flooring function.
+                                       𝑓(⋅)                     Fitness function.
+                                       𝑠𝑜𝑟𝑡(⋅)               Ranking is based on fitness values from smallest to largest.
+                                       𝑟𝑎𝑛𝑑𝑝𝑒𝑟𝑚(𝑛, 𝑙)  Return a row vector containing 𝑙 unique integers that are randomly
+                                                                 selected between 1 and 𝑛.
+                                       ⊙                         Hadamard product.
+     • Reproduction                                                                    2.2.1. Foraging
+                                                                                                           For foraging behavior, we considered the internal and external
+                    Euglena exhibits a simple form of asexual reproduction known as    factors of the protozoa. Internal factors are regarded as the foraging
+binary fission. During this process, the euglena splits into two identical             characteristics of the protozoa, whereas external factors are considered
+individuals. The optimal temperature range for euglena reproduction                    as environmental influences such as species collisions and competitive
+is between 20–35 ◦C. Binary fission commences with mitosis of the eu-                  behaviors.
+glena nucleus and involves the replication of the flagellum, esophagus,                     • Autotrophic mode
+and stigma. The subsequent division occurs along the longitudinal axis
+of the cell. Initially, a cleft is formed at the front part, and then the V-                               As mentioned previously, a protozoan can produce carbohydrates
+shaped bifurcation gradually progresses toward the posterior until the                 through chloroplasts to supply nutrition. If the protozoan is exposed to
+two halves are completely separated [48].                                              strong light intensity, it will move away from its position and move
+                                                                                       toward a location with a lower light intensity. The converse is true
+2.2. Mathematical models                                                               when it is in a location with low light intensity. Assuming that the
+                                                                                       light intensity around the 𝑗th protozoan is suitable for photosynthesis,
+                In this subsection, the algorithm to solve the minimization problem    the protozoan will move to the location of the 𝑗th protozoan. For the
+is introduced. Table 1 provides a list of notations and nomenclature                   autotrophic mode, we provide the following mathematical model:
+that are used. The representation of a solution set is essential for meta-                                                           𝑛𝑝
+heuristic algorithms. In our proposed algorithm, the protozoa represent                𝑋𝑖𝑛𝑒𝑤 = 𝑋𝑖 + 𝑓 ⋅ (𝑋𝑗 − 𝑋𝑖 + 1 ⋅ ∑ 𝑤𝑎⋅ (𝑋𝑘− − 𝑋𝑘+)) ⊙ 𝑀𝑓    (1)
+the solution set, and each protozoan has its position consisting of 𝑑𝑖𝑚                                                     𝑛𝑝 𝑘=1
+variables.                                                                             𝑋𝑖 = [𝑥1, 𝑥2, …, 𝑥𝑑𝑖𝑚],       𝑋𝑖 = 𝑠𝑜𝑟𝑡(𝑋𝑖)                    (2)
+                                                                                                𝑖  𝑖     𝑖
+                                                                                    4
+---
+X. Wang et al.                                                                                                             Knowledge-Based Systems 295 (2024) 111737
+                                                                                                         2.2.3. Reproduction
+𝑓 = 𝑟𝑎𝑛𝑑 ⋅ (1 + cos(     𝑖𝑡𝑒𝑟  ⋅ 𝜋))                                        (3)                                          At an appropriate age and health, protozoa undergo asexual re-
+                            𝑖𝑡𝑒𝑟𝑚𝑎𝑥                                                               production, which is known as binary fission. Theoretically, this re-
+𝑛𝑝     = ⌊𝑝𝑠 − 1⌋                                                                 (4)                production causes the protozoan to split into two identical daughters.
+   𝑚𝑎𝑥   2                                                                                            We simulated this behavior by generating a duplicate protozoan and
+          |  𝑓(𝑋𝑘−)     |                                                                             considering a perturbation. The mathematical model for reproduction
+         −|                |                                                          (5)                is as follows:
+𝑤  = 𝑒  |𝑓(𝑋𝑘+)+𝑒𝑝𝑠|
+  𝑎      |                |
+                   {1,  if 𝑑𝑖 is in 𝑟𝑎𝑛𝑑𝑝𝑒𝑟𝑚(𝑑𝑖𝑚,⌈𝑑𝑖𝑚⋅ 𝑖 ⌉)                             𝑋𝑖𝑛𝑒𝑤 = 𝑋𝑖 ± 𝑟𝑎𝑛𝑑 ⋅ (𝑋𝑚𝑖𝑛 + 𝑅𝑎𝑛𝑑 ⊙ (𝑋𝑚𝑎𝑥− 𝑋𝑚𝑖𝑛)) ⊙ 𝑀𝑟  (13)
+𝑀𝑓 [𝑑𝑖] =       0,  otherwise               𝑝𝑠                                  (6)                𝑀𝑟[𝑑𝑖] = {1,  if 𝑑𝑖 is in 𝑟𝑎𝑛𝑑𝑝𝑒𝑟𝑚(𝑑𝑖𝑚,⌈𝑑𝑖𝑚⋅ 𝑟𝑎𝑛𝑑⌉)         (14)
+where 𝑋𝑛𝑒𝑤 and 𝑋𝑖 denote the updated position, and original position                                           0,    otherwise
+of the      𝑖
+          𝑖th protozoan, respectively. 𝑋𝑗 is the randomly selected                 𝑗th               where ‘‘±’’ implies the perturbation can be forward and reverse. 𝑀𝑟 is
+protozoan. 𝑋𝑘−        denotes a randomly selected protozoan in the                  𝑘th               a mapping vector in the reproduction process, whose size is (1 × 𝑑𝑖𝑚),
+paired neighbor whose rank index is less than               𝑖. Specifically, if 𝑋𝑖 is 𝑋1,            and each element is 0 or 1.
+𝑋𝑘− is also set as 𝑋1. 𝑋𝑘+ denotes a randomly selected protozoan in the
+𝑘th paired neighbor, and its rank index is greater than                 𝑖. Particularly,               2.2.4. Algorithm
+if 𝑋𝑖  is 𝑋𝑝𝑠, 𝑋𝑘+ is also set to 𝑋𝑝𝑠, where 𝑝𝑠       is the population size.                                        The details of the APO are presented below. To integrate all the
+𝑓 represents a foraging factor and  𝑟𝑎𝑛𝑑                     denotes a random number                mathematical models, the parameters involved are as follows:
+in the [0,1] interval from the uniform distribution.   𝑖𝑡𝑒𝑟 and               𝑖𝑡𝑒𝑟𝑚𝑎𝑥         𝑝𝑓 = 𝑝𝑓  ⋅ 𝑟𝑎𝑛𝑑                                                             (15)
+denote the current and maximum iterations, respectively. 𝑛𝑝 indicates                                              𝑚𝑎𝑥
+the number of neighbor pairs among the external factors and 𝑛𝑝𝑚𝑎𝑥                 is                         1        𝑖𝑡𝑒𝑟
+the maximum value of 𝑛𝑝. 𝑤𝑎 is a weight factor in the autotrophic mode                               𝑝𝑎ℎ = 2   ⋅ (1 + cos(𝑖𝑡𝑒𝑟𝑚𝑎𝑥 ⋅ 𝜋))                                        (16)
+and 𝑒𝑝𝑠  (2.2204e−16) is a significantly small number. ⊙                   denotes the                         1        𝑖
+Hadamard product. 𝑀𝑓                       is a mapping vector for foraging with a size                𝑝𝑑𝑟 = 2  ⋅ (1 + cos((1 − 𝑝𝑠 )⋅ 𝜋))                                            (17)
+of (1 ×𝑑𝑖𝑚), where each element is 0 or 1. 𝑑𝑖 denotes the dimensional
+index 𝑑𝑖 ∈ {1,2, …, 𝑑𝑖𝑚}.                                                                           where 𝑝𝑓  is a proportion fraction of dormancy and reproduction in
+    • Heterotrophic mode                                                                                 the protozoa population and 𝑝𝑓𝑚𝑎𝑥 is the maximum value of 𝑝𝑓. 𝑝𝑎ℎ
+                                                                                                         indicates the probabilities of autotrophic and heterotrophic behaviors,
+                       In the dark, a protozoan can obtain nutrients by absorbing organic                and 𝑝𝑑𝑟 indicates the probabilities of dormancy and reproduction.
+matter from its surroundings. Assuming that 𝑋𝑛𝑒𝑎𝑟 is a nearby food-rich                                                       Note that the proposed APO has only two special parameters: 𝑛𝑝
+location, the protozoan moves toward it. For the heterotrophic mode,                                     (number of neighbor pairs) and 𝑝𝑓𝑚𝑎𝑥 (maximum proportion fraction).
+we propose the following mathematical model:                                                             The framework of the proposed algorithm is shown in Fig. 2, and the
+                                                                                                         corresponding pseudo code is outlined in Algorithm 1.
+                                     𝑛𝑝
+𝑋𝑖𝑛𝑒𝑤 = 𝑋𝑖 + 𝑓 ⋅ (𝑋𝑛𝑒𝑎𝑟 − 𝑋𝑖 + 1 ⋅ ∑𝑤ℎ ⋅ (𝑋𝑖−𝑘 − 𝑋𝑖+𝑘)) ⊙ 𝑀𝑓  (7)                2.3. Algorithm analysis
+                               𝑛𝑝 𝑘=1
+𝑋𝑛𝑒𝑎𝑟 = (1 ±𝑅𝑎𝑛𝑑 ⋅ (1 − 𝑖𝑡𝑒𝑟  )) ⊙ 𝑋𝑖                                  (8)                                           In this subsection, the proposed APO algorithm is analyzed by
+                               𝑖𝑡𝑒𝑟𝑚𝑎𝑥                                                            considering the algorithm design, search operators, exploration and
+          | 𝑓(𝑋  )    |                                                                                exploitation, and computational complexity.
+         −|  𝑖−𝑘      |                                                             (9)
+𝑤  = 𝑒  |𝑓(𝑋𝑖+𝑘)+𝑒𝑝𝑠|
+  ℎ       |             |
+𝑅𝑎𝑛𝑑 = [𝑟𝑎𝑛𝑑1, 𝑟𝑎𝑛𝑑2, …, 𝑟𝑎𝑛𝑑𝑑𝑖𝑚]                                 (10)                2.3.1. A discussion on APO algorithm design
+                                                                                                                                 The design of metaheuristic algorithms is inspired by nature. In
+where 𝑋𝑛𝑒𝑎𝑟 is a nearby location, and ‘‘±’’ implies that 𝑋𝑛𝑒𝑎𝑟 can be in                       the last 20 years, hundreds of new algorithms have been proposed by
+different directions from the  𝑖th protozoan. 𝑋𝑖−𝑘 denotes the              (𝑖 − 𝑘)th              researchers to enable more successful search performance. Fig. 3 illus-
+protozoan selected from the 𝑘th paired neighbor, and its rank index is                                  trates the general process and frequently used methods of metaheuristic
+𝑖 − 𝑘. Specifically, if 𝑋𝑖 is 𝑋1, 𝑋𝑖−𝑘 is also set to 𝑋1. 𝑋𝑖+𝑘    denotes the                algorithms. Metaheuristic algorithms can be divided into two stages to
+(𝑖 + 𝑘)th protozoan selected from the 𝑘th paired neighbor, and its rank                               be analyzed. The first stage is the initialization of the population, with
+index is             𝑖+ 𝑘. Particularly, if 𝑋𝑖 is 𝑋𝑝𝑠, 𝑋𝑖+𝑘 is also set to 𝑋𝑝𝑠. 𝑤ℎ is the  random sampling and Latin hypercube sampling as the main manners.
+weight factor in the heterotrophic mode. 𝑅𝑎𝑛𝑑 is a random vector with                                Once the initial population is generated, each candidate solution’s
+elements in the [0,1] interval.                                                                          fitness value is evaluated. The second phase is an iterative search
+                                                                                                         process for the population, associated with three steps. The first step
+2.2.2. Dormancy                                                                                          is the guidance mechanism, this step solves how to select candidate
+                           During environmental stress, a protozoan may adopt dormant be-                solutions from the population as reference positions in the search space.
+havior as a survival strategy to endure unfavorable conditions. When                                     Each reference position can be a candidate solution or a combination
+the protozoan is dormant, it is replaced by a newly generated proto-                                     of multiple candidate solutions. The random method employs a non-
+zoan to maintain a constant population. The mathematical model for                                       deterministic approach to select candidate solutions, and this random
+dormancy is as follows:                                                                                  selection contributes to the diversity of the population search. The
+                                                                                                         greedy method selects candidate solutions with better fitness values
+𝑋𝑖𝑛𝑒𝑤 = 𝑋𝑚𝑖𝑛 + 𝑅𝑎𝑛𝑑 ⊙ (𝑋𝑚𝑎𝑥− 𝑋𝑚𝑖𝑛)                              (11)                to guide the search of the population. This method focuses more on
+                                                                                                         convergence and searches around promising candidate solutions. The
+𝑋𝑚𝑖𝑛 = [𝑙𝑏1, 𝑙𝑏2,…, 𝑙𝑏𝑑𝑖𝑚],  𝑋𝑚𝑎𝑥 = [𝑢𝑏1, 𝑢𝑏2, …, 𝑢𝑏𝑑𝑖𝑚]   (12)                probabilistic method takes into account the characteristics of both
+                                                                                                         the random and greedy selection, and a candidate solution with a
+where 𝑋𝑚𝑖𝑛 and 𝑋𝑚𝑎𝑥                 represent the lower- and upper-bound vectors,                better fitness value is more likely to be selected. Probabilistic methods
+respectively. 𝑙𝑏𝑑𝑖 and 𝑢𝑏𝑑𝑖 indicate the lower and upper bounds of the                           commonly used are the roulette wheel and tournament methods. The
+𝑑𝑖th variable, respectively.                                                                           last one is the ordinal method. This selection focuses on the relative
+                                                                         5
+---
+X. Wang et al.                                                                                             Knowledge-Based Systems 295 (2024) 111737
+                                                 Fig. 2. The framework of artificial protozoa optimizer.
+                                                Fig. 3. The general process of metaheuristic algorithms.
+order of indexes in the population, sequentially selecting each candi-       that better candidate solutions are selected to the next generation.
+date solution as a reference position. The second step is the search         The meta-heuristic algorithms will provide the optimal solutions found
+operators, which model the unique behavior of natural populations.           after the second iteration stage. Recently, some researchers investi-
+The algorithms differ from each other, but these models serve the            gated the guidance mechanism and update mechanism in metaheuristic
+exploration and exploitation tasks. Exploration maintains the diversity      algorithms, and proposed several promising methods: fitness-distance
+of candidate solutions and prevents premature convergence to a local         balance (FDB) [49], adaptive fitness-distance balance (AFDB) [50],
+optimum. However, exploitation emphasizes the search around the              fitness-distance-constraint (FDC) [51], dynamic fitness-distance bal-
+reference positions to find the optimum to accelerate convergence.           ance (DFDB) [52], and natural survivor method (NSM) [53]. These new
+The update mechanism is the third step. This is to define the new            methods can be introduced into the design of metaheuristic algorithms.
+population, selecting candidate solutions for the next generation to         For the APO algorithm proposed in this paper, the initialization
+search. The first one is the direct method, no pre-processing process        is based on traditional random sampling; the guidance mechanism is
+is performed and the new candidate solutions are directly selected to        an ordinal selection method; the update mechanism uses the fitness
+the next generation. The second method, fitness value-based selection,
+is the most frequently used. This method is based on Darwin’s theory         value-based method; and for the important exploration and exploitation
+of evolution, where the principle of ‘‘survival of the fittest’’ determines  phases, the related search operators are next described in detail.
+                                                                      6
+---
+X. Wang et al.                                                                                                                                                         Knowledge-Based Systems 295 (2024) 111737
+Algorithm 1 Pseudo code of the proposed artificial protozoa optimizer                                             are updated. 𝑀𝑓                        = [1, 0] implies that only the first dimension of the
+Input:                                 Initialize parameters 𝑝𝑠, 𝑑𝑖𝑚, 𝑛𝑝, 𝑝𝑓𝑚𝑎𝑥, and MaxFEs (maximum  𝑖th protozoan is updated. 𝑀𝑓 =                           [0,1] implies that only the second
+    function evaluations).                                                                                        dimension is updated. Eventually, one of the three red points 𝑋𝑖𝑛𝑒𝑤                    is
+Output:   The global optima 𝑋𝑔𝑏𝑒𝑠𝑡 and 𝑓 (𝑋𝑔𝑏𝑒𝑠𝑡).                                                   selected based on 𝑀𝑓 to update the 𝑖th protozoan.
+  1: while FEs < MaxFEs do                                                                                          •  Heterotroph (exploitation)
+ 2:     sort(𝑋𝑖),  𝑖 = 1,2,… , 𝑝𝑠;
+ 3:     𝑝𝑓 = 𝑝𝑓𝑚𝑎𝑥⋅ 𝑟𝑎𝑛𝑑;  ∕∕ proportion fraction                                                       As shown in Fig. 4(b), 𝑋𝑖 denotes the position of the                         𝑖th protozoan
+ 4:     𝐷𝑟𝑖𝑛𝑑𝑒𝑥 = 𝑟𝑎𝑛𝑑𝑝𝑒𝑟𝑚(𝑝𝑠, ⌈𝑝𝑠⋅𝑝𝑓⌉);            ∕∕ index vector of dormancy              and 𝑋𝑛𝑒𝑎𝑟 denotes a location near that of the                          𝑖th protozoan. The
+    and reproduction                                                                                              vector 𝑋𝑖𝑋𝑛𝑒𝑎𝑟 simulates the internal factor of the 𝑖th protozoan in the
+ 5:     for𝑖 = 1 ∶ 𝑝𝑠 do                                                                                       heterotrophic mode. 𝑋𝑖−𝑘 and 𝑋𝑖+𝑘 denote the selected protozoa in the
+ 6:        if 𝑖 is in 𝐷𝑟𝑖𝑛𝑑𝑒𝑥 then                                                                        𝑘th paired neighbor (𝑛𝑝 is set to 1, which implies that only one pair of
+ 7:           if 𝑝𝑑𝑟 > 𝑟𝑎𝑛𝑑 then                                                                           neighbors is considered). The rank index of 𝑋𝑖−𝑘 is𝑖−𝑘, and that of 𝑋𝑖+𝑘
+ 8:               Calculate 𝑋𝑖𝑛𝑒𝑤 using Eq. (11);  ∕∕ dormancy.                                              is𝑖 + 𝑘. Particularly, if 𝑋𝑖 is 𝑋1, 𝑋𝑖−𝑘 is set to 𝑋1; if 𝑋𝑖  is 𝑋𝑝𝑠, 𝑋𝑖+𝑘 is
+ 9:           else                                                                                                also set to 𝑋𝑝𝑠. 𝑤ℎ is the weight factor in the heterotrophic mode. The
+10:               𝑀𝑟 = 𝑧𝑒𝑟𝑜𝑠(1, 𝑑𝑖𝑚);                                                                   vector 𝑋𝑛𝑒𝑎𝑟𝑋𝑛𝑒𝑤 simulates the external factors of the                 𝑖th protozoan.
+11:               𝑀𝑟[1, 𝑟𝑎𝑛𝑑𝑝𝑒𝑟𝑚(𝑑𝑖𝑚,⌈𝑑𝑖𝑚⋅ 𝑟𝑎𝑛𝑑⌉)] = 1;                                            𝑖
+12:               Calculate 𝑋𝑛𝑒𝑤   using Eq. (13);  ∕∕ reproduction                                           The foraging factor 𝑓 and mapping vector 𝑀𝑓                        refer to the autotrophic
+                                      𝑖                                                                          mode. Finally, one of the three red points of 𝑋𝑛𝑒𝑤                    is selected based on
+13:           end if                                                                                              𝑀𝑓 to update the 𝑖th protozoan.  𝑖
+14:        else
+15:           𝑀𝑓 = 𝑧𝑒𝑟𝑜𝑠(1, 𝑑𝑖𝑚);  𝑖                                                                     •  Dormancy (exploration)
+16:           𝑀𝑓 [1, 𝑟𝑎𝑛𝑑𝑝𝑒𝑟𝑚(𝑑𝑖𝑚, ⌈𝑑𝑖𝑚⋅ 𝑝𝑠⌉)] = 1;                                              As shown in Fig. 4(c), 𝑋 denotes the position of the                          𝑖th protozoan.
+17:           if 𝑝𝑎ℎ > 𝑟𝑎𝑛𝑑 then                                                                            When the  𝑖
+18:               Calculate 𝑋𝑛𝑒𝑤   using Eq. (1);   ∕∕                            foraging in an                                                   𝑖th protozoan encounters environmental stress, it becomes
+    autotroph                          𝑖                                                                         dormant to survive. A randomly generated new protozoan will replace
+19:           else                                                                                                it to maintain a constant population. Therefore, the                         𝑖th protozoan, 𝑋𝑖
+20:               Calculate 𝑋𝑛𝑒𝑤   using Eq. (7);   ∕∕                             foraging in a              is updated to 𝑋𝑛𝑒𝑤.
+                                       𝑖                                                                              𝑖
+    heterotroph                                                                                                     •  Reproduction (exploitation)
+21:           end if
+22:        end if𝑛𝑒𝑤                                                                                            As shown in Fig. 4(d), 𝑋𝑖 denotes the position of the                 𝑖th protozoan.
+23:        if 𝑓 (𝑋𝑖  ) < 𝑓(𝑋𝑖) then                                                                         The vector 𝑋 𝑋𝑛𝑒𝑤 represents a perturbation (𝛥) that simulates a repro-
+24:           𝑋𝑖 ← 𝑋𝑛𝑒𝑤;                                                                                         𝑖  𝑖
+25:        else       𝑖                                                                                          ductive mutation. 𝑀𝑟                         is a mapping vector with elements 0 or 1 during
+26:           𝑋𝑖 ← 𝑋𝑖;                                                                                        reproduction. If 𝑀𝑟                        = [1,1], both the dimensions of the 𝑖th protozoan
+27:        end if                                                                                                 are updated; if 𝑀𝑟 = [1, 0], only the first dimension is updated; and if
+28:     end for                                                                                                   𝑀𝑟                           = [0,1], only the second dimension is updated. Thus, one of the
+                                                                                                                  three red points of 𝑋𝑛𝑒𝑤 is selected based on 𝑀𝑟 to update the                       𝑖th
+29:     𝑋𝑔𝑏𝑒𝑠𝑡 = 𝑜𝑝𝑡{𝑋𝑖};                                                                              protozoan.  𝑖
+30:     FEs ← FEs + ps;
+31: end while                                                                                                     2.3.3. Exploration and exploitation
+                                                                                                                                              The effectiveness of metaheuristic algorithms depends on a balance
+                                                                                                                  between exploration and exploitation. Six parameters (𝑝𝑓, 𝑝𝑎ℎ, 𝑝𝑑𝑟,                  𝑓,
+2.3.2. Search operators                                                                                           𝑀𝑓 , and 𝑀𝑟) play important roles in the exploration and exploitation.
+                                  For a clear understanding of the mathematical models, Fig. 4 shows                                           Fig. 5 illustrates the exploration and exploitation phases of the
+the search operators in two dimensions (𝑛𝑝 = 1). Note that this ap-                                             proposed APO algorithm. The initial state of the protozoa is based on
+proach can be extended to higher dimensions.                                                                      the proportion fraction (𝑝𝑓), which categorizes whether the protozoa
+                                                                                                                  are involved in foraging (autotroph and heterotroph), dormancy, or re-
+    • Autotroph (exploration)                                                                                     production. Autotroph and dormancy focus on large-coverage searches
+    In Fig. 4(a), 𝑓                       is the foraging factor. For 𝑓 > 1, 𝑓 = 1, or 𝑓 < 1, the             to improve the exploration ability of the algorithm. Conversely, het-
+updated 𝑋𝑛𝑒𝑤 is represented by blue, red, or green points, respectively.                                      erotroph and reproduction search for promising areas to improve the
+           𝑖                                                                                                     exploitation ability. 𝑝𝑎ℎ                       is a probability parameter for autotroph and
+The following analysis is based on the case where 𝑓                                 = 1. 𝑋𝑖 denotes            heterotroph. If 𝑝𝑎ℎ > 𝑟𝑎𝑛𝑑, then the protozoa are in autotrophic mode.
+the position of the 𝑖th protozoan and 𝑋𝑗                              denotes a randomly selected              Otherwise, they are in heterotrophic mode. As the number of iterations
+𝑗th protozoan. A rank index of        𝑗 < 𝑖 implies that the                        𝑖th protozoan             increases, 𝑝𝑎ℎ                        gradually decreases, shifting the focus from autotroph
+is at a lower light intensity and exhibits phototaxis; if the rank index                                          to heterotroph. 𝑝𝑑𝑟 is the probability parameter for dormancy and
+𝑗 > 𝑖, then the𝑖th protozoan is at a higher light intensity and exhibits                                       reproduction. If 𝑝𝑑𝑟 > 𝑟𝑎𝑛𝑑, then the protozoa are dormant. Otherwise,
+photophobia. Conversely, if the rank index 𝑗 = 𝑖, then the 𝑖th protozoan                                       they are in reproductive mode. 𝑝𝑑𝑟 is related to the ranking of the proto-
+is under a suitable light intensity for photosynthesis. The vector 𝑋𝑖𝑋𝑗                                       zoans. The inferior protozoa tend to perform dormancy to enhance their
+simulates the internal factor of the                                𝑖th protozoan in the autotrophic             exploration. Conversely, the superior protozoa tend to reproduce to en-
+mode. 𝑋𝑘− and 𝑋𝑘+ denote the randomly selected protozoa in the 𝑘th                                           hance their exploitation. The emphasis on exploration by the parameter
+paired neighbor (𝑛𝑝 is set to 1, implying that only one pair of neighbors                                       𝑝𝑑𝑟                       extends not only during the initial iteration but also throughout
+is considered). The rank index of 𝑋𝑘− is less than                            𝑖 and the rank index             the final iteration, providing significant assistance in mitigating the
+of 𝑋𝑘+ is greater than 𝑖. Particularly, if 𝑋𝑖                     is 𝑋1, 𝑋𝑘− is also set to 𝑋1,          local optimal stagnation. 𝑓                     is a foraging factor that controls the search
+and if 𝑋𝑖 is 𝑋𝑝𝑠, 𝑋𝑘+                      is also set to 𝑋𝑝𝑠. 𝑤𝑎 is the weight factor in the         distance of the protozoa during foraging. The dynamic characteristics
+autotrophic mode. The vector 𝑋𝑗 𝑋𝑛𝑒𝑤 simulates the external factors of                                      are shown in Fig. 6. As the number of iterations increases, the value of
+the  𝑖th protozoan. 𝑀                                     𝑖
+                      𝑓                                 is a mapping vector with elements 0 or 1 in              𝑓 gradually decreases from 2 to 0. This results in the search distance
+foraging. 𝑀𝑓                         = [1, 1] implies that both dimensions of the    𝑖th protozoan             transitioning from blue to red points, and then to green points in
+                                                                         7
+---
+X. Wang et al.                                                                                                  Knowledge-Based Systems 295 (2024) 111737
+                                                               Fig. 4. Search operators.
+                                                                                    Fig. 6. Dynamic character of foraging factor during 100 iterations.
+                    Fig. 5. Exploration and exploitation.
+                                                                             affects the mutated dimensions. It performs an exploitation to focus on
+Figs. 4(a) and (b). This transition is beneficial for balancing exploration  searching nearby locations for the protozoa.
+and exploitation. 𝑀𝑓 and 𝑀𝑟 are the mapping vectors that control the     2.3.4. Computational complexity
+updated dimensions of the protozoa. 𝑀𝑓 is related to the ranking of the                The proposed APO algorithm primarily performs sorting, autotroph
+protozoa. The dimensions of the low-ranked protozoa changed more,            and heterotroph, dormancy and reproduction, and fitness function
+whereas the dimensions of the top-ranked protozoa changed less. This         evaluation. The computational complexity of sorting is 𝑂(𝑝𝑠   ⋅ log(𝑝𝑠)),
+causes the inferior protozoa to focus on exploration and the superior        autotroph and heterotroph is 𝑂((𝑝𝑠 − ⌈𝑝𝑠 ⋅ 𝑝𝑓⌉)⋅ 𝑛𝑝⋅ 𝑑𝑖𝑚), dormancy
+protozoa to focus on exploitation. 𝑀𝑟 is a random mapping vector that      and reproduction is 𝑂(⌈𝑝𝑠  ⋅𝑝𝑓⌉⋅ 𝑑𝑖𝑚), and fitness function evaluation is
+                                                                          8
+---
+X. Wang et al.                                                                                                         Knowledge-Based Systems 295 (2024) 111737
+                  Table 2
+                  Benchmark functions of the 2022 IEEE Congress on Evolutionary Computation (CEC2022).
+                                                   No.             Functions                                                        𝑓𝑚𝑖𝑛
+                   Unimodal function               F1              Shifted and full Rotated Zakharov function                       300
+                                                   F2              Shifted and full Rotated Rosenbrock’s function                   400
+                   Multimodal functions            F3              Shifted and full Rotated Expanded Schaffer’s f6 function         600
+                                                   F4              Shifted and full Rotated Non-Continuous Rastrigin’s function     800
+                                                   F5              Shifted and full Rotated Levy function                           900
+                                                   F6              Hybrid function 1 (𝑁       = 3)                                 1800
+                   Hybrid functions                F7              Hybrid function 2 (𝑁       = 6)                                 2000
+                                                   F8              Hybrid function 3 (𝑁       = 5)                                 2200
+                                                   F9              Composition function 1 (𝑁   = 5)                                2300
+                   Composition functions           F10             Composition function 2 (𝑁   = 4)                                2400
+                                                   F11             Composition function 3 (𝑁   = 5)                                2600
+                                                   F12             Composition function 4 (𝑁   = 6)                                2700
+                                                                   Search range: [−100,100]𝑑𝑖𝑚
+                Table 3
+                Parameter setting of the comparison algorithms.
+                                                      Algorithm           Parameter settings                                           Year
+                                                      GA                  selection - roulette wheel, crossover - whole arithmetic,    1975
+                                                                          mutation - uniform mutation, mutation rate = 0.2
+                 Evolutionary-based algorithm         DE                  𝑓 = 0.7, 𝑐𝑟 = 0.1                                         1995
+                                                      BSA                 𝑚𝑖𝑥𝑟𝑎𝑡𝑒 = 1                                           2013
+                                                      Jaya                no special parameters                                        2016
+                                                      PSO                 𝑣𝑚𝑖𝑛 = −10, 𝑣𝑚𝑎𝑥 = 10, 𝑤= [0.9,0.4], 𝑐₁, 𝑐₂ = 2   1995
+                 Swarm-based algorithm                GWO                 𝑎 = [2,0]                                                   2014
+                                                      WOA                 𝑎 = [2,0]                                                   2016
+                                                      PPE                 𝑎 = 1.1, 𝑐 = 0.2                                           2021
+                                                      GSA                 𝐺₀ = 100, 𝛼 = 20                                           2009
+                 Physics-based algorithm              MVO                 𝑊 𝐸𝑃𝑚𝑖𝑛 = 0.2, 𝑊 𝐸𝑃𝑚𝑎𝑥 = 1, 𝑝= 0.6              2015
+                                                      SCA                 𝑎 = 2                                                       2016
+                                                      AOA                 𝛼 = 5, 𝜇 = 0.5                                             2021
+                                                      TLBO                no special parameters,  𝑝𝑠 =  1⋅  setting 𝑝𝑠,            2011
+                                                                                                          2
+                                                                          because each generation uses (2 ×𝑝𝑠)  FEs.
+                                                      SDO                 no special parameters,  𝑝𝑠 =  1⋅  setting 𝑝𝑠,            2019
+                 Human-based algorithm                                                                    2
+                                                                          because each generation uses (2 ×𝑝𝑠)  FEs.
+                                                      SPO                 no special parameters,  𝑝𝑠 =  1⋅  setting 𝑝𝑠,            2020
+                                                                                                          4
+                                                                          because each generation uses (4 ×𝑝𝑠)  FEs.
+                                                      SPBO                no special parameters                                        2020
+𝑂(𝑝𝑠⋅𝑓(⋅)). Consequently, the total complexity is 𝑂(𝑖𝑡𝑒𝑟𝑚𝑎𝑥⋅(𝑝𝑠⋅log(𝑝𝑠)+      3.2. The performance of APO at different population scales
+((𝑝𝑠−⌈𝑝𝑠⋅𝑝𝑓⌉)⋅𝑛𝑝+ ⌈𝑝𝑠⋅𝑝𝑓⌉)⋅𝑑𝑖𝑚+𝑝𝑠⋅𝑓 (⋅))). In particular, if𝑛𝑝 = 1, then
+the complexity of the APO algorithm is𝑂(𝑖𝑡𝑒𝑟𝑚𝑎𝑥⋅𝑝𝑠⋅(log(𝑝𝑠)+𝑑𝑖𝑚+𝑓(⋅))).                    This part investigates the impact of different population sizes on
+                                                                                              the proposed APO algorithm. Despite the same computing resources,
+3. Experimental analysis                                                                      variations in performance still exist for the same algorithm. We assessed
+                                                                                              the APO algorithm under different population sizes by examining three
+    In this  section, the  proposed   algorithm   is evaluated   using                   the  categories: small (𝑝𝑠 = 10, 20), medium (𝑝𝑠 = 40, 50), and large (𝑝𝑠 =
+CEC2022 benchmark [54]. A detailed definition of the benchmark is                             80, 100) populations. Table 4 lists the rankings based on the Friedman
+provided in Table 2. The experimental simulation was executed on a                            test. For example, for the unimodal function (F1), 𝑝𝑠 10, 𝑝𝑠 20, 𝑝𝑠 40,
+personal laptop loaded with Windows 11 operating system, equipped                             𝑝𝑠 50,      𝑝𝑠 80, and 𝑝𝑠 100 are ranked sixth, fifth, fourth, third, second,
+with 16 GB RAM, and powered by an Intel(R) Core(TM) i7-8750H CPU                              and first, respectively. This indicates that for the unimodal function,
+@ 2.20 GHz 2.21 GHz. The APO algorithm was coded in MATLAB.                                   as the population size increases, the performance of APO is improved.
+                                                                                              The average ranking of different population sizes under that function is
+                                                                                              shown for the multimodal, hybrid, and composition functions. It can be
+3.1. Parameter setting                                                                        seen that 𝑝𝑠 100, and 𝑝𝑠 80 perform better, except that 𝑝𝑠 80 ranks third
+                                                                                              in the hybrid function. The ranking is the comparison result of three
+                              For the CEC2022 benchmark, the research followed the standards  population sizes under four types of functions. The rankings of large,
+defined at the CEC conference. The number of dimensions of the                                medium, and small population sizes are first, second, and third. The
+function (𝑑𝑖𝑚) was 20, the number of max fitness evaluations was                           results show that for our proposed APO algorithm, large populations
+1,000,000, and each algorithm was executed 30 times. In the proposed                          outperform medium and small populations.
+APO algorithm, 𝑛𝑝 was set to 1 considering the algorithm complexity.
+The parameter    𝑝𝑓 𝑚𝑎𝑥 was systematically tested at                 0,0.1, 0.2, …, and  3.3. Comparison of APO with some state-of-the-art algorithms metaheuristic
+1. The results of the Friedman test method indicated that superior                            algorithms
+performance was achieved at 0.1. Consequently, 𝑝𝑓𝑚𝑎𝑥 was set to 0.1 in
+this paper. For the compared algorithms, the parameter settings were                                            The proposed APO algorithm was compared with 32 state-of-the-
+based on the original references. Table 3 lists the detailed parameters                       art algorithms under the CEC2022 benchmark. 𝑝𝑠 was set to 100, max
+and their corresponding publication years.                                                    iteration was set to 10,000 (MaxFEs = 1000,000), and each benchmark
+                                                                              9
+---
+X. Wang et al.                                                                                               Knowledge-Based Systems 295 (2024) 111737
+              Table 4
+              Comparison of the proposed APO algorithm for different population sizes.
+                                                     Small population              Medium population                      Large population
+               𝑝𝑠                                  10              20            40             50                      80     100
+               Unimodal function (F1)                6               5             3              4                       2      1
+               Multimodal functions (F2–F5)          6               5             4              3                       2      1
+               Hybrid functions (F6–F8)              6               4             5              2                       3      1
+               Composition functions (F9–F12)        5               6             4              3                       2      1
+               Mean rank (U/M/H/C)                      5.5/5.5/5/5.5                 3.5/3.5/3.5/3.5                     1.5/1.5/2/1.5
+               Ranking (U/M/H/C)                           3/3/3/3                       2/2/2/2                          1/1/1/1
+function was shifted to the same global minimum ‘‘0’’. Table 5 lists the    the compared state-of-the-art algorithms on the CEC2022 benchmark.
+detailed results. ‘‘Mean’’ and ‘‘Std’’ denote the mean and standard de-     Consequently, the proposed APO algorithm is considered a novel and
+viation of the best-so-far results given by each algorithm, respectively.   promising optimization method.
+For enhanced readability, the best ‘‘Mean’’ result is highlighted in light
+red, while the best ‘‘Std’’ result is highlighted in green. Comparing       3.3.2. Convergence analysis
+the mean results, it is found that the proposed APO algorithm is                         The convergence of metaheuristic algorithms is closely related to
+particularly close to the SDO algorithm on F1 and has the best results      exploration and exploitation. Exploration is an extensive search of the
+among the algorithms on F3–F4 and F6–F9. For the remaining test             solution space to find potentially better solutions rather than local
+functions, although the proposed APO algorithm did not obtain the           optima. However, exploitation is a search toward more promising areas,
+best results, it was still superior to most algorithms. The comparison      accelerating the discovery of optimal or near-optimal solutions. A bal-
+results of 16 advanced algorithms are placed in the supplementary ma-       ance between exploration and exploitation is crucial to the algorithm’s
+terial, refer to Table A.3–A.6. They include algorithms: aquila optimizer   performance. If the algorithm excessively emphasizes exploration, it
+(AO) [55], artificial rabbits optimization (ARO) [56], coati optimiza-      may waste too much time exploring unknown areas and fail to ef-
+tion algorithm (COA) [57], dandelion optimizer (DO) [58], electric eel      fectively exploit known information to accelerate convergence toward
+foraging optimization (EEFO) [59], five phases algorithm (FPA) [60],        the optimal solution. This could result in slower convergence or fail-
+gannet optimization algorithm (GOA) [61], hippopotamus optimization         ure to converge to satisfactory solutions. Conversely, If the algorithm
+(HO) [62], mountain gazelle optimizer (MGO) [63], marine preda-             excessively exploits known solutions, it may prematurely converge to
+tors algorithm (MPA) [64], quasi-affine transformation evolutionary         local optima, preventing exploration of other potential solutions in the
+(QUATRE) [65], reptile search algorithm (RSA) [66], sea-horse opti-         search space. This could eventually converge to suboptimal solutions.
+mizer (SHO) [67], slime mould algorithm (SMA) [68], tunicate swarm          Therefore, we used a dimension-wise diversity measurement [72,73]
+algorithm (TSA) [69], and zebra optimization algorithm (ZOA) [70].          to evaluate the performance of the proposed APO algorithm. The
+                                                                            exploration and exploitation rates are calculated as follows:
+3.3.1. Non-parametric statistical analysis                                  𝑒𝑟𝑟 =  𝑑𝑖𝑣                                                          (18)
+             To better investigate the performance of APO, we applied non-      𝑑𝑖𝑣𝑚𝑎𝑥
+parametric test methods to assess the significant differences among the            𝑑𝑖𝑣𝑚𝑎𝑥− 𝑑𝑖𝑣
+algorithms. Any two algorithms were compared using the Wilcoxon             𝑒𝑖𝑟 =  𝑑𝑖𝑣𝑚𝑎𝑥                                                    (19)
+signed-rank test, whereas multiple algorithms were compared using the
+Friedman test [71].                                                                           𝑑𝑖𝑚 𝑝𝑠
+                                                                            𝑑𝑖𝑣 =  1  ⋅ ∑∑ |          𝑗            𝑗|
+      Wilcoxon signed-rank test can determine whether there is a statisti-                      |𝑚𝑒𝑑𝑖𝑎𝑛(𝑥 ) − 𝑥 |                             (20)
+cal difference in the results between the proposed APO algorithm and            𝑑𝑖𝑚⋅ 𝑝𝑠  𝑗=1 𝑖=1 |              𝑖|
+other algorithms. The test was conducted at the 5% significance level.      where 𝑒𝑟𝑟 and 𝑒𝑖𝑟    are the exploration and exploitation rates, respec-
+The statistical results are shown at the end of Table 5. When compared      tively, for an iteration. 𝑑𝑖𝑣 and     𝑑𝑖𝑣𝑚𝑎𝑥 represent the diversity of the
+to the other algorithms, ‘‘Win’’, ‘‘Draw’’, and ‘‘Lost’’ indicate that the  entire population in one generation and maximum diversity in all
+APO algorithm achieves ‘‘better performance’’, ‘‘similar performance’’,     generations, respectively. 𝑚𝑒𝑑𝑖𝑎𝑛(𝑥𝑗) and 𝑥𝑗 denote the median value
+                                                                                                                               𝑖
+and ‘‘worse performance’’, respectively. In comparison to the GA, Jaya,     of the 𝑗th dimension across all individuals and 𝑗th dimension value of
+GWO, WOA, PPE, SCA, AOA, SPO, and SPBO, our proposed APO                    the 𝑖th individual, respectively.
+algorithm can win 12 times, draw 0 times, and lose 0 times. The                            For exploration and exploitation rates, 100 protozoa were simu-
+results indicate that among the compared algorithms, the DE and BSA         lated over 500 iterations on the functions (F1–F12). Fig. 7 plots the
+algorithms exhibit strong performance. However, the proposed APO            results obtained by the APO algorithm. In the initial iterations, the
+algorithm still outperforms them, winning 7 times, drawing 3 times,         proposed APO algorithm emphasizes intensive exploration with limited
+and losing only 2 times. The parameters 𝑝-value,𝑅+, 𝑅− involved in the   exploitation. Conversely, as the iterations progress, it transitions to
+Wilcoxon signed-rank test method, and the comparison results of each        reduced exploration and heightened exploitation. The performance of
+function can be viewed in Table A.1 in the supplementary material.          the algorithm is affected by the test functions, and it can be seen that
+         Friedman test is a comparison test that can find significant dif-  as the number of iterations increases, the exploration rate gradually
+ferences among multiple algorithms. The overall ranking of the 17           decreases, while the exploitation rate gradually increases, and the later
+algorithms on the 12 benchmark functions is shown at the end of             exploitation rate is significantly higher than the exploration rate except
+Table 5. According to the ranking results, the proposed APO algorithm       for the F7 and F8 test functions. The APO algorithm demonstrates good
+performed best, ranking first among the 17 algorithms, followed by          abilities to balance exploration and exploitation during the iterations.
+BSA and DE algorithms. SCA, AOA, and SPO algorithms show worse                            To further explore the convergence of the APO algorithm, we con-
+results. Some of the algorithms showed the same performance, for            ducted a related experiment: simulating five protozoa in 20 dimensions
+example, MVO and SPBO both ranked fifth, PSO and TLBO both ranked           over 150 iterations. Fig. 8 illustrates the experimental results in two-
+ninth, and Jaya and WOA both ranked thirteenth. For the Friedman test       dimensional space, providing additional insights for the evaluation.
+method, the average ranking of the algorithms on the 12 functions, and      The first column shows the fitness landscapes of the unimodal (F1),
+the ranking of each function, refer to Table A.2 in the supplementary       multimodal (F2–F5), and composition (F9–12) functions. The second
+material. From the above results, the APO evidently outperformed            column plots the search history, and the red pentagram represents the
+                                                                       10
+---
+11
+         Table 5
+         Experimental results of artificial protozoa optimizer and 16 comparative algorithms on CEC2022.
+           Fun.     Index          APO             GA             DE            BSA            Jaya           PSO           GWO            WOA            PPE            GSA            MVO            SCA           AOA            TLBO           SDO             SPO          SPBO
+            F1      Mean        1.5158E−14     1.7863E+03     6.3541E+01     2.4828E−04     7.4929E+03    3.2043E−06     4.9282E
+                                                                                                                                +03     1.9456E+01     1.5026E−04     9.7105E+03     1.7147E−03     4.7965E+03    3.0441E+04     1.5334E+03     0.0000E+00     8.5843E
+                                                                                                                                                                                                                                                                     +04      6.7431E
+                                                                                                                                                                                                                                                                                    +02
+                    Std         2.5567E−14     3.1889E+02     2.7482E+01     5.2037E−04     1.4638E+03    2.6646E−06     3.0532E
+                                                                                                                                +03     1.9551E+01     7.8548E−05     1.8891E+03     8.3213E−04     1.4039E+03    8.9421E+03     1.1835E+03     0.0000E+00     3.7505E
+                                                                                                                                                                                                                                                                     +04      2.2710E
+                                                                                                                                                                                                                                                                                    +02
+            F2      Mean        4.8910E+01     7.3987E+01     4.4900E+01     4.7533E+01     8.9697E+01    2.8567E+01     7.2824E
+                                                                                                                                +01     6.1174E+01     4.9858E+01     4.9279E+01     4.3821E+01     1.8378E+02    2.0569E+03     4.6685E+01     3.7213E+01     1.1913E
+                                                                                                                                                                                                                                                                     +03      5.3797E
+                                                                                                                                                                                                                                                                                    +01
+                    Std         9.5627E−01     3.9499E+00     8.7486E+00     7.7468E+00     1.8721E+01    2.1522E+01     2.7904E
+                                                                                                                                +01     2.3629E+01     1.9072E+01     1.0647E+00     1.1114E+01     2.5970E+01    7.1438E+02     3.5117E+00     2.0918E+01     5.3192E
+                                                                                                                                                                                                                                                                     +02      1.2052E
+                                                                                                                                                                                                                                                                                    +01
+            F3      Mean        7.5791E−14     5.3975E+00     1.1369E−13     1.0611E−13     1.3499E+01    3.1822E+01     9.7599E
+                                                                                                                                −01     5.2128E+01     2.0264E+00     3.3315E+01     9.7312E−01     2.9503E+01    5.2497E+01     3.0344E+01     6.6182E−01     4.2912E
+                                                                                                                                                                                                                                                                     +01      8.0179E
+                                                                                                                                                                                                                                                                                    −02
+                    Std         5.4509E−14     6.0488E−01     0.0000E+00     2.8843E−14     1.6195E+00    7.4213E+00     8.2626E
+                                                                                                                                −01     1.4155E+01     3.9980E+00     7.9191E+00     1.9870E+00     3.6768E+00    4.4944E+00     7.1651E+00     1.0572E+00     1.7939E
+                                                                                                                                                                                                                                                                     +01      4.7659E
+                                                                                                                                                                                                                                                                                    −02
+            F4      Mean        5.8080E+00     8.9475E+01     3.3651E+01     2.5623E+01     1.1365E+02    5.9100E+01     4.0720E
+                                                                                                                                +01     1.0739E+02     5.6613E+01     7.3925E+01     4.2503E+01     1.1753E+02    1.0365E+02     8.2900E+01     3.2966E+01     1.6059E
+                                                                                                                                                                                                                                                                     +02      9.6710E
+                                                                                                                                                                                                                                                                                    +01
+                    Std         1.9764E+00     5.5059E+00     4.6664E+00     5.7189E+00     9.0888E+00    1.2083E+01     2.0575E
+                                                                                                                                +01     2.5710E+01     1.2902E+01     8.2633E+00     1.7080E+01     9.5302E+00    1.1227E+01     1.9485E+01     1.1210E+01     3.5923E
+                                                                                                                                                                                                                                                                     +01      1.0123E
+                                                                                                                                                                                                                                                                                    +01
+            F5      Mean        2.9843E−03     5.4604E+01     1.6489E+00     1.3642E−13     3.8385E+02    3.9023E+02     6.4314E
+                                                                                                                                +01     2.2903E+03     5.5267E+02     0.0000E+00     1.0614E−01     6.3936E+02    1.5253E+03     1.4380E+03     1.8378E+01     2.9671E
+                                                                                                                                                                                                                                                                     +03      4.9628E
+                                                                                                                                                                                                                                                                                    +00
+                    Std         1.6346E−02     1.4024E+01     1.1475E+00     4.6252E−14     1.1786E+02    3.0567E+02     5.6484E
+                                                                                                                                +01     1.1784E+03     1.5589E+02     0.0000E+00     4.0878E−01     1.9671E+02    7.1773E+01     6.0650E+02     2.4265E+01     2.0524E
+                                                                                                                                                                                                                                                                     +03      4.9693E
+                                                                                                                                                                                                                                                                                    +00
+            F6      Mean        3.5179E+01     1.6627E+03     7.6174E+03     4.6660E+01     2.8479E+07    4.1492E+02     5.4369E
+                                                                                                                                +04     5.6291E+03     2.2926E+03     1.1456E+03     1.3747E+04     4.7086E+07    1.1610E+05     6.2156E+04     1.1360E+02     5.4073E
+                                                                                                                                                                                                                                                                     +08      4.7675E
+                                                                                                                                                                                                                                                                                    +03
+                    Std         2.2617E+01     9.9000E+02     3.9527E+03     2.0440E+01     1.4237E+07    7.8275E+02     1.6863E
+                                                                                                                                +05     5.8590E+03     1.7217E+03     6.6349E+02     8.9344E+03     2.9946E+07    6.2465E+05     1.6875E+05     1.0753E+02     8.2470E
+                                                                                                                                                                                                                                                                     +08      4.2408E
+                                                                                                                                                                                                                                                                                    +03
+            F7      Mean        1.2911E+01     3.8782E+01     2.0813E+01     1.3914E+01     9.4879E+01    8.9918E+01     4.8326E
+                                                                                                                                +01     1.4679E+02     5.2165E+01     3.1833E+02     4.3184E+01     9.7681E+01    1.7715E+02     8.4191E+01     4.1962E+01     1.7378E
+                                                                                                                                                                                                                                                                     +02      3.2480E
+                                                                                                                                                                                                                                                                                    +01
+                    Std         7.5497E+00     8.9573E+00     3.6168E+00     6.4545E+00     9.4474E+00    4.2943E+01     2.5962E
+                                                                                                                                +01     4.7372E+01     1.4628E+01     5.8689E+01     2.8475E+01     1.3681E+01    7.1756E+01     1.5755E+01     1.3366E+01     6.0390E
+                                                                                                                                                                                                                                                                     +01      6.3137E
+                                                                                                                                                                                                                                                                                    +00
+            F8      Mean        1.9754E+01     2.6203E+01     2.2154E+01     2.1243E+01     3.5182E+01    5.9918E+01     3.8631E
+                                                                                                                                +01     4.1587E+01     3.4610E+01     2.4136E+02     6.9278E+01     4.1606E+01    1.2427E+02     3.4974E+01     2.1816E+01     9.7509E
+                                                                                                                                                                                                                                                                     +02      3.3369E
+                                                                                                                                                                                                                                                                                    +01
+                    Std         2.3634E+00     8.5478E−01     4.0658E−01     1.3709E+00     3.0255E+00    5.5722E+01     3.5733E
+                                                                                                                                +01     1.1228E+01     3.5987E+01     5.4998E+01     6.8399E+01     3.3712E+00    7.6430E+01     3.0702E+00     1.0542E+00     4.2687E
+                                                                                                                                                                                                                                                                     +03      1.2634E
+                                                                                                                                                                                                                                                                                    +00
+            F9      Mean        1.8078E+02     1.8933E+02     1.8078E+02     1.8078E+02     1.8977E+02    1.8934E+02     1.9164E
+                                                                                                                                +02     1.8119E+02     1.8080E+02     1.8078E+02     1.8079E+02     2.2497E+02    6.3915E+02     1.8089E+02     1.8078E+02     5.1082E
+                                                                                                                                                                                                                                                                     +02      1.8079E
+                                                                                                                                                                                                                                                                                    +02
+                    Std         8.6723E−14     1.2939E+00     3.7513E−05     1.6471E−13     2.3377E+00    1.9528E+01     1.5930E
+                                                                                                                                +01     4.3189E−01     1.5431E−02     1.2820E−13     6.6539E−03     1.4006E+01    1.3441E+02     6.8565E−02     8.6723E−14     1.6157E
+                                                                                                                                                                                                                                                                     +02      4.0761E
+                                                                                                                                                                                                                                                                                    −03
+           F10      Mean        1.0033E+02     1.2860E+02     9.3867E+01     1.0049E+02     1.3753E+03    1.0626E+03     6.8868E
+                                                                                                                                +02     1.5229E+03     2.2946E+02     2.4475E+03     1.2204E+03     1.1273E+02    1.5317E+03     1.3511E+02     1.0059E+02     2.6770E
+                                                                                                                                                                                                                                                                     +03      1.4791E
+                                                                                                                                                                                                                                                                                    +02
+                    Std         3.6067E−02     7.1964E+01     2.4752E+01     4.7469E−02     1.3769E+03    9.4515E+02     5.4130E
+                                                                                                                                +02     1.0673E+03     1.6348E+02     5.6397E+02     8.6706E+02     3.4417E+00    5.4484E+02     1.5561E+02     1.3271E−01     1.2328E
+                                                                                                                                                                                                                                                                     +03      7.4444E
+                                                                                                                                                                                                                                                                                    +01
+           F11      Mean        3.0333E+02     6.8170E+02     2.8369E+02     1.6002E+02     1.0729E+03    3.5370E+02     6.5005E
+                                                                                                                                +02     5.2810E+02     3.2001E+02     3.5000E+02     3.3799E+02     1.4128E+03    5.8495E+03     3.0510E+02     3.2667E+02     4.5123E
+                                                                                                                                                                                                                                                                     +03      3.5210E
+                                                                                                                                                                                                                                                                                    +02
+                    Std         1.8257E+01     3.4694E+01     1.3691E+02     1.4344E+02     2.1041E+02    1.6778E+02     1.9816E
+                                                                                                                                +02     1.0462E+03     7.6107E+01     5.0855E+01     7.1116E+01     3.4108E+02    8.6153E+02     1.5024E+02     4.4978E+01     1.4030E
+                                                                                                                                                                                                                                                                     +03      8.3403E
+                                                                                                                                                                                                                                                                                    +01
+           F12      Mean        2.3711E+02     2.7515E+02     2.3503E+02     2.3392E+02     2.4847E+02    3.8741E+02     2.5356E
+                                                                                                                                +02     3.2229E+02     4.4787E+02     5.0753E+02     2.4295E+02     2.9651E+02    7.4006E+02     2.6070E+02     2.6416E+02     5.1297E
+                                                                                                                                                                                                                                                                     +02      2.4515E
+                                                                                                                                                                                                                                                                                    +02
+                    Std         3.6438E+00     6.4562E+00     1.6015E+00     1.8457E+00     2.6293E+00    1.3224E+02     1.3748E
+                                                                                                                                +01     6.9277E+01     8.2984E+01     1.2039E+02     9.7241E+00     1.0365E+01    1.3497E+02     1.7575E+01     1.3774E+01     1.2775E
+                                                                                                                                                                                                                                                                     +02      8.4873E
+                                                                                                                                                                                                                                                                                    +00
+            Win/Draw/Lost        compared        12/0/0         7/3/2          7/3/2          12/0/0        11/0/1         12/0/0         12/0/0         12/0/0         10/0/2         11/0/1         12/0/0        12/0/0         11/0/1         9/1/2          12/0/0         12/0/0
+               Ranking              1              8              3              2              13             9             11             13             7              12             5              15            16              9             4              17             5
+                                                                                                                                                                                                                                                                                                X. Wang et al.
+                                                                                                                                                                                                                                                                                                Knowledge-Based Systems 295 (2024) 111737
+---
+X. Wang et al.                                                                                               Knowledge-Based Systems 295 (2024) 111737
+                                                  Fig. 7. Exploration and exploitation rate for F1–F12.
+obtained global optimum. From the sparsity of the sample points, we       algorithms. For multimodal functions, on the F3 and F4 functions,
+can observe that the distribution of points far from the global optimum   the proposed APO performs best among the algorithms and converges
+is sparse, whereas the distribution of points close to it is dense. This  faster. The results on F2 and F5 are also better than most algorithms.
+shows that the APO can achieve extensive exploration of space and         For hybrid functions (F6–F8), the proposed APO performs better than
+intensive exploitation of promising areas. The third and fourth columns   all comparison algorithms. It can be seen that the comparison algo-
+show the trajectories in the first and second dimensions of the five      rithms are premature or have not converged. Moving to the composi-
+protozoa over the iterations, respectively. In the previous iterations,   tion functions, the proposed APO still performs best on the F9 function,
+the values of the protozoa changed drastically and abruptly, but this     and DE, BSA, GSA, and SDO also show similar results. For the F10
+change gradually faded in later iterations. The fifth column shows        function, the proposed APO performs only worse than DE. For F11
+the average fitness values of the five protozoa. The average fitness      and F12, the BSA algorithm performs best, followed by DE and our
+value gradually decreases throughout the iteration process, signaling an  proposed APO algorithm. Convergence analysis confirmed that the APO
+improvement in the overall quality of the candidate solutions. The sixth  algorithm can perform better solutions with faster convergence than its
+column presents the convergence curves. Throughout each iteration,        compared algorithms in most benchmark functions.
+the fitness value of the best protozoan gradually decreases, indicat-
+ing that the APO algorithm gradually converges. In summary, these         4. Application
+indicators demonstrate that our APO algorithm effectively maintains
+a balance between the exploration and exploitation phases, leading to         This section discusses certain practical applications of the proposed
+an improved solution quality within the population.                       APO algorithm in engineering design and multilevel image segmenta-
+   The convergence behavior of the proposed APO algorithm is ana-         tion problems.
+lyzed above. Next, the convergence of the APO algorithm is compared
+with the state-of-the-art algorithms in the unimodal, multimodal, hy-     4.1. Engineering design
+brid, and composition functions. Unimodal functions have a sole locally
+optimal solution, serving as a benchmark for evaluating the algorithm’s               The proposed APO algorithm addressed the design challenges in
+exploitation capability. Conversely, multimodal functions contain mul-    tension/compression springs, pressure vessels, welded beams, speed
+tiple locally optimal solutions and are evaluated for the exploration     reducers, and three-bar trusses [74–76]. Fig. 10 illustrates five widely
+of the algorithm. Hybrid functions are a combination of unimodal          recognized engineering designs, with specific details available in the
+and multimodal functions and present a more complex search space          supplementary material (I-V). These five engineering designs are con-
+structure. Composition functions are complex functions consisting of      tinuous space optimization problems with constraints. Various strate-
+multiple simple functions, entailing a highly nonlinear and irregular     gies are discussed for handling constraints in [77,78], including the in-
+search space. Hybrid and composition functions can assess the balance     corporation of penalty functions, decoder functions, repair algorithms,
+between exploration and exploitation. The mean fitness convergence        special operators, feasibility-preserving representations, and the sepa-
+curves of the algorithms are shown in Fig. 9. For the unimodal function   ration of objectives and constraints. In this study, the penalty function
+F1, SDO performs best and can find the global optimal solution 0.         was chosen because of its simplicity and low computational cost.
+The proposed APO algorithm is also very competitive, achieving the        It directly penalizes infeasible candidate solutions and then converts
+result with a mean fitness value of 1.5158E−14, and it converges faster.  constrained optimization into unconstrained optimization. For mini-
+These two algorithms are significantly better than other comparison       mization problems, the penalty function assigns large function values to
+                                                                       12
+---
+X. Wang et al.                                                                                                  Knowledge-Based Systems 295 (2024) 111737
+                             1                1
+                                              1
+                                                                                                                     1                1
+     Fig. 8. Fitness landscape, search history, trajectory, average fitness, and convergence curve of unimodal (F1), multimodal (F2–F5), and composition (F9–12) functions.
+infeasible solutions, which causes them to be discarded by metaheuris-      4.1.1. Tension/compression spring
+tic algorithms during optimization. In the experiments,   𝑝𝑠 was set to       The goal of the tension/compression spring design is to minimize
+100, the maximum number of iterations was set to 500, and the number        the manufacturing costs by optimizing three structural variables: the
+of runs for the algorithms was 31; for the other parameters, refer to       wire diameter (𝑑), mean coil diameter (𝐷), and number of active coils
+Section 3.1. We selected the first half of the algorithms in Table 3 for    (𝑁). The design process is governed by constraints related to the shear
+comparison (evolutionary- and swarm-based algorithms). The optimal
+results obtained for each design problem are highlighted in bold font       stress, surge frequency, and minimum deflection. The best experimental
+in the tables.                                                              results of the APO and comparative algorithms are listed in Table 6.
+                                                                         13
+---
+X. Wang et al.                                                                                               Knowledge-Based Systems 295 (2024) 111737
+                                              Fig. 9. Convergence curves of the mean fitness value of F1–F12.
+                                                      Fig. 10. Five engineering design problems.
+Notably, the APO achieves the lowest cost (0.01266529) under spe-           the variables were set at 0.77916, 0.38516, 40.3707, and 199.3144,
+cific variables (0.0516521, 0.355829, and 11.3413). When compared           the proposed APO algorithm achieved an optimal cost of 5887.614.
+with the eight algorithms (GA, DE, BSA, Jaya, PSO, GWO, WOA, and            The APO algorithm consistently outperforms its counterparts in the
+PPE), the proposed algorithm demonstrates greater competitiveness in        pressure vessel design problem, excluding Jaya and PSO, offering more
+addressing the tension/compression spring design problem.                   competitive results.
+4.1.2. Pressure vessel 1                                                    4.1.3. Welded beam
+   The pressure vessel design aims to minimize the overall costs related     The objective of designing a welded beam is to minimize the ex-
+to materials, forming, and welding. This design challenge involves          penses related to manufacturing and optimize four crucial structural
+determining the shell thickness (𝑇𝑠), head thickness (𝑇ℎ), inner radius  variables: weld thickness (ℎ), length of clamped steel bars (𝑙), height
+(𝑅), and cylindrical section length (𝐿) while satisfying four specified   of steel bars (𝑡), and thickness of bars (𝑏). This design process is
+constraints. The best experimental results are listed in Table 7. When      constrained by the shear stress (𝜏), bending stress in the beam (𝜎),
+                                                                       14
+---
+X. Wang et al.                                                                                            Knowledge-Based Systems 295 (2024) 111737
+                        Table 6
+                        Tension/compression spring design: the experimental results of APO and eight comparative algorithms.
+                         Algorithm           Optimal variables                                         Optimum
+                                             𝑑                   𝐷                        𝑁
+                         APO                 0.0516521            0.355829                  11.3413    0.01266529
+                         GA                  0.0603490            0.599940                  4.55340    0.01459647
+                         DE                  0.0521916            0.368916                  10.6088    0.01267075
+                         BSA                 0.0520386            0.365182                  10.8110    0.01266898
+                         Jaya                0.0514321            0.350519                  11.6747    0.01267934
+                         PSO                 0.0517542            0.358286                  11.1976    0.01266531
+                         GWO                 0.0518078            0.359533                  11.1281    0.01266866
+                         WOA                 0.0514827            0.351773                  11.5848    0.01266602
+                         PPE                 0.0524206            0.374571                  10.3145    0.01267525
+                     Table 7
+                     Pressure vessel design: the experimental results of APO and eight comparative algorithms.
+                      Algorithm         Optimal variables                                                    Optimum
+                                        𝑇𝑠             𝑇ℎ                𝑅               𝐿
+                      APO               0.77916          0.38516            40.3707          199.3144        5887.614
+                      GA                1.14157          0.57814            58.7532          42.0918         6998.416
+                      DE                0.78597          0.38862            40.7128          194.6202        5901.043
+                      BSA               0.78054          0.38976            40.4390          198.5150        5904.985
+                      Jaya              0.77817          0.38465            40.3196          200             5885.336
+                      PSO               0.77817          0.38482            40.3196          200             5885.813
+                      GWO               0.77946          0.38549            40.3836          199.1158        5888.614
+                      WOA               0.79192          0.38838            40.6099          195.9977        5956.492
+                      PPE               0.83161          0.41430            43.0675          165.1467        6000.281
+buckling load on the bar (𝑃𝑐), end deflection of the beam (𝛿), and       the tension/compression spring design. PSO ranks second, WOA ranks
+side constraints. The challenge is to achieve an optimal solution for       third, GWO ranks fourth, BSA ranks fifth, DE ranks sixth, PPE ranks
+these variables within the specified constraints, ensuring both cost        seventh, Jaya ranks eighth, and GA ranks ninth. For the rankings of the
+effectiveness and structural reliability of the welded beam. Table 8 lists  other four design problems, refer to that of the tension/compression
+the best experimental outcomes generated by the algorithms. In this de-     spring design problem. According to the Friedman test method, the
+sign problem, the APO algorithm achieves an optimal cost (1.724854)         overall ranking of the five designs is as follows: APO ranks first, PSO
+with the variables (0.20573, 3.4705, 9.0366, and 0.20573), mirroring        ranks second, Jaya ranks third, DE ranks fourth, GWO ranks fifth, BSA
+the results obtained by Jaya and PSO. These results highlighted the         ranks sixth, PPE ranks seventh, WOA ranks eighth, and GA ranks ninth.
+effectiveness of the proposed APO in the welded-beam design problem.
+                                                                            4.1.6. Analysis of stability and computational complexity on the five engi-
+4.1.4. Speed reducer                                                        neering design problems
+         The primary goal in the design of a speed reducer is weight mini-             The performance of metaheuristic algorithms is affected by prob-
+mization. This design process considers various parameters, including       lem complexity, and they inherently operate as stochastic methods.
+surface width (𝑥1), tooth module (𝑥2), number of teeth in the pinion      Analyzing algorithm stability and computational efficiency is essential.
+(𝑥3), length of first shaft between bearings (𝑥4), length of second       This part of the research investigates the stability and computational
+shaft between bearings (𝑥5), diameter of the first shaft (𝑥6), and di-    complexity of the proposed algorithm that performs on five engineer-
+ameter of the second shaft (𝑥7). Moreover, this design is bound by         ing design problems. The task of the algorithms is to find feasible
+constraints such as managing the bending stresses in the gear teeth,        solutions for the engineering design problems in the minimum time.
+surface stresses, lateral deflection of the shaft, and stresses within the  Three evaluation indicators are introduced: success rate (SR), average
+shaft. With respect to this design challenge, Table 9 shows that the        number of fitness evaluations (AFEs), and average calculation durations
+APO contributes the most favorable weight (2994.471) using differ-          (ACDs) [79], defined as follows:
+ent variables (3.5, 0.7, 17, 7.3, 7.71532, 3.35021, 5.28665). DE and        𝑆𝑅 = 𝑟 ⋅ 100                                                        (21)
+Jaya also demonstrate comparable performance. When addressing this                  𝑅
+design problem, the APO outperformed the comparison algorithms.                              𝑟
+                                                                            𝐴𝐹 𝐸𝑠 = 1  ⋅ ∑𝐹 𝐸𝑠(𝑖)                                          (22)
+4.1.5. Three-bar truss                                                                  𝑟  𝑖=1
+         The purpose of the three-bar truss design is weight minimization.                   𝑟
+This design involves two variables: the cross-sectional areas of the first  𝐴𝐶𝐷𝑠 = 1   ⋅ ∑𝐶𝑎𝑙𝑐𝑢𝑙𝑎𝑡𝑖𝑜𝑛_𝐷𝑢𝑟𝑎𝑡𝑖𝑜𝑛(𝑖)          (23)
+(𝐴1) and second (𝐴2) bars. The design was subjected to constraints                    𝑟  𝑖=1
+encompassing the stress, deflection, and buckling of each bar. Table 10     where   𝑟  is the number of successful searches for a feasible solution
+lists the best experimental results from each algorithm. Notably, the       defined by the problem. 𝑅 is the number of algorithm runs. FEs and
+APO achieves the optimal weight (263.8958) with the correspond-             Calculation_Duration         are the number of fitness evaluations, and the
+ing variables (0.78868 and 0.40825). Furthermore, DE and PSO also           running time used by the algorithm to find the feasible solution.
+demonstrate commendable performances. The experimental results in-                   According to the mean result of each algorithm, this paper selects
+dicate the effectiveness of the proposed APO algorithm for this design      the median ranking algorithm as the acceptable standard, and its mean
+problem.                                                                    result is used as a feasible solution to each engineering design problem.
+      Table 11 provides an overview of the best results for the nine algo-  For example, in the tension/compression spring problem, Jaya ranks
+rithms. Notably, the APO stands out as the top-ranking algorithm for        fifth among the nine algorithms, and its mean value is defined as the
+                                                                     15
+---
+X. Wang et al.                                                                                            Knowledge-Based Systems 295 (2024) 111737
+                        Table 8
+                        Welded-beam design: the experimental results of APO and eight comparative algorithms.
+                         Algorithm         Optimal variables                                              Optimum
+                                           ℎ               𝑙                       𝑡      𝑏
+                         APO               0.20573         3.4705                   9.0366  0.20573       1.724854
+                         GA                0.23614         3.1413                   8.3938  0.24180       1.867287
+                         DE                0.20553         3.4752                   9.0413  0.20666       1.733063
+                         BSA               0.20518         3.4599                   9.0963  0.20552       1.731286
+                         Jaya              0.20573         3.4705                   9.0366  0.20573       1.724854
+                         PSO               0.20573         3.4705                   9.0366  0.20573       1.724854
+                         GWO               0.20562         3.4748                   9.0374  0.20573       1.725369
+                         WOA               0.20166         3.5605                   9.0362  0.20687       1.739211
+                         PPE               0.20560         3.4744                   9.0366  0.20574       1.725258
+Table 9
+Speed reducer design: the experimental results of APO and eight comparative algorithms.
+ Algorithm         Optimal variables                                                                                              Optimum
+                   𝑥1              𝑥2             𝑥3         𝑥4                  𝑥5         𝑥6              𝑥7
+ APO               3.5              0.7             17          7.3                  7.71532     3.35021          5.28665         2994.471
+ GA                3.51538          0.70061         17          7.35568              7.74519     3.36023          5.28932         3012.430
+ DE                3.5              0.7             17          7.3                  7.71532     3.35021          5.28665         2994.471
+ BSA               3.5              0.7             17          7.3                  7.71534     3.35022          5.28666         2994.472
+ Jaya              3.5              0.7             17          7.3                  7.71532     3.35021          5.28665         2994.471
+ PSO               3.5              0.7             17          8.26743              8.3         3.35214          5.28686         3016.465
+ GWO               3.50075          0.7             17          7.37393              7.71758     3.36224          5.28666         2998.546
+ WOA               3.50263          0.7             17          7.68301              7.72017     3.35334          5.28666         2999.791
+ PPE               3.50022          0.70002         17          7.30673              7.71619     3.35034          5.28669         2994.818
+    Table 10                                                                       that the proposed APO algorithm outperforms the eight state-of-the-art
+    Three-bar truss design: the experimental results of APO and eight comparative  algorithms in solving the five engineering design problems.
+    algorithms.
+     Algorithm        Optimal variables               Optimum                      4.2. Multilevel image segmentation
+                      𝐴1            𝐴2
+     APO              0.78868        0.40825          263.8958                                      Image segmentation technology, which is an important part of
+     GA               0.79037        0.40347          263.8983                     image processing, pattern recognition, and computer vision, provides
+     DE               0.78868        0.40825          263.8958                     significant inspiration for subsequent image analyses. Its current ap-
+     BSA              0.78870        0.40818          263.8960                     plications span diverse fields, including face recognition, video surveil-
+     Jaya             0.78866        0.40828          263.8959                     lance, object tracking, medical image analysis, image compression, and
+     PSO              0.78868        0.40825          263.8958                     augmented reality [80–83]. Thresholding is one of the most popular
+     GWO              0.78883        0.40781          263.8960                     and fundamental approaches in the field of image segmentation. In
+     WOA              0.78933        0.40639          263.8962                     general, this method selects thresholds according to gray-level his-
+     PPE              0.78862        0.40840          263.8959                     tograms and then divides the pixels into different classes. Bi-level
+                                                                                   image segmentation is a relatively straightforward process that divides
+                                                                                   an image into objects and backgrounds based on a single threshold.
+feasible solution to this problem. The feasible solutions to the other             However, as we move to multilevel image segmentation, the complexity
+four engineering design problems are selected from the algorithms                  of the problem intensifies, and the accuracy tends to decrease because
+APO, DE, PPE, and PPE respectively. Table 12 gives feasible solutions              of the increasing number of categories. Consequently, multilevel im-
+to five engineering design problems. Success rate, average number of               age segmentation is more challenging. Currently, numerous methods
+fitness evaluations, and average calculation durations are presented in            utilizing Renyi [84], Masi [85], Tsallis [86], Shannon [87], and cross-
+Table 13. The comparison of algorithms first considers the success rate,           [88–90] entropies have been investigated. In this study, the minimum
+and then compares the average number of fitness evaluations, and av-               cross-entropy threshold (MCET) was used as the objective function to
+erage calculation durations. The best results obtained by the algorithms           calculate the optimal segmentation thresholds for color images.
+have been bolded. For the tension/compression spring design, the
+proposed APO algorithm searches for the feasible solution with SR of               4.2.1. Minimum cross-entropy threshold
+100%, AFEs of 9900, and ACDs of 0.13 s, which outperforms the other                       Kullback first presented cross-entropy in [91]. Let 𝑃 = {𝑝1, 𝑝2,…, 𝑝𝑛}
+eight algorithms. From the results of five engineering design problems,            and 𝑄 = {𝑞1, 𝑞2, …, 𝑞𝑛}   be expressed as two probability distributions.
+the proposed APO algorithm achieves 100% SR on the four problems,                  The cross-entropy is an information-theoretic distance between two
+and its AFEs and ACDs are also competitive. This result demonstrates               distributions and is defined as follows:
+the advantages of the APO algorithm’s stability and computational                     𝑛
+efficiency. For the pressure vessel problem, the performance of APO                𝐶(𝑃 , 𝑄) = ∑𝑝𝑖 log 𝑝𝑖                                             (24)
+is worse than Jaya, DE, BSA, and GWO, but better than PSO, PPE,                      𝑖=1   𝑞𝑖
+WOA, and GA. It is worth mentioning that the Jaya algorithm closely                              Multilevel image segmentation focuses on identifying the bound-
+follows the proposed APO algorithm, which obtains 100% SR      with                aries to divide an image into multiple regions. Consider dividing an
+high computational efficiency on the three problems. GA has the worst              image into (𝑛 + 1) classes using 𝑛 thresholds. The 𝑛 thresholds are
+performance among the algorithms. It failed to find feasible solutions             denoted as {𝑡1, 𝑡2,…, 𝑡𝑛}. Pixels belonging to {0,…, 𝑡1} are in  𝑐𝑙𝑎𝑠𝑠1,
+for the five problems. In summary, the above experiments confirm                   pixels belonging to {𝑡1, …, 𝑡2} are in 𝑐𝑙𝑎𝑠𝑠2, ⋯, and pixels belonging
+                                                                     16
+---
+X. Wang et al.                                                                                                              Knowledge-Based Systems 295 (2024) 111737
+Table 11
+Ranking of algorithms on the five engineering design problems.
+                                    APO           GA          DE                                        BSA   Jaya   PSO     GWO           WOA      PPE
+ Tension/compression spring              1        9           6                                         5     8      2       4             3        7
+ Pressure vessel                         3        9           5                                         6     1      2       4             7        8
+ Welded beam                             2        9           7                                         6     2      2       5             8        4
+ Speed reducer                           2        8           2                                         4     2      9       6             7        5
+ Three-bar truss                         2        9           2                                         6.5   4.5    2       6.5           8        4.5
+ Mean rank                               2        8.8         4.4                                       5.5   3.5    3.4     5.1           6.6      5.7
+ Ranking                                 1        9           4                                         6     3      2       5             8        7
+Table 12
+Feasible solutions for the five engineering design problems.
+                                Tension/compression spring     Pressure vessel                              Welded beam     Speed reducer   Three-bar truss
+ Feasible solutions             0.01273171                     6117.896                                     1.765002        2996.868        263.8963
+Table 13
+Success rate (SR), average number of fitness evaluations (AFEs) and average calculation durations (ACDs) on the five engineering design problems.
+                                               APO         GA       DE                                     BSA     Jaya    PSO     GWO     WOA     PPE
+                                 SR (%)        100         0        67.74                                  80.65   96.77   83.87   96.77   16.13   6.45
+ Tension/compression spring      AFEs          9900        –        23 267                                 33 684  19 447  10 819  46 517  1980    9500
+                                 ACDs (s)      0.13        –        0.24                                   0.15    0.10    0.04    0.24    0.01    0.68
+                                 SR (%)        0.7419      0        96.77                                  96.77   100     41.94   87.10   3.23    9.68
+ Pressure vessel                 AFEs          21 435      –        15 703                                 31 880  12 042  33 254  26 248  4500    40 500
+                                 ACDs (s)      0.27        –        0.16                                   0.13    0.06    0.12    0.13    0.03    2.91
+                                 SR (%)        100         0        54.84                                  74.19   100     77.42   100     3.23    35.48
+ Welded beam                     AFEs          11 255      –        33 847                                 40 600  10 394  12 604  34 565  15 000  18 309
+                                 ACDs (s)      0.15        –        0.38                                   0.21    0.06    0.06    0.21    0.08    1.31
+                                 SR (%)        100         0        100                                    100     100     0       0       0       48.39
+ Speed reducer                   AFEs          6148        –        5035                                   17 126  5642    –       –       –       37 767
+                                 ACDs (s)      0.11        –        0.07                                   0.12    0.04    –       –       –       2.81
+                                 SR (%)        100         0        100                                    100     51.61   100     12.90   3.23    61.29
+ Three-bar truss                 AFEs          6423        –        17 155                                 29 216  35 538  14 916  49 200  28 800  43 089
+                                 ACDs (s)      0.08        –        0.17                                   0.11    0.15    0.05    0.20    0.12    3.07
+to {𝑡𝑛,…, 𝐿} are in                                      𝑐𝑙𝑎𝑠𝑠𝑛+1. 𝐿 denotes the maximum value among
+the pixels. Consequently, the MCET method calculates 𝑛 thresholds as
+follows:
+{𝑡∗, 𝑡∗, …, 𝑡∗} = arg min{𝑓 (𝑡1, 𝑡2,…, 𝑡𝑛)}                                                (25)
+ 1  2     𝑛
+                 𝐿               𝑛+1 𝑡 −1
+                 ∑                ∑ ∑
+                                       𝑘
+𝑓(𝑡1, 𝑡2, …, 𝑡𝑛) = 𝑖=1𝑖 ⋅ 𝑧(𝑖)⋅ log(𝑖) −𝑘=1𝑖=𝑡𝑘−1𝑖⋅ 𝑧(𝑖)⋅ log(𝑢(𝑡𝑘−1, 𝑡𝑘)),  (26)
+Subject to   0 < 𝑡1 < 𝑡2 < ⋯ < 𝑡𝑛 < 𝐿
+            ∑𝑡𝑘−1         𝑖 ⋅ 𝑧(𝑖)
+𝑢(𝑡  , 𝑡 ) =      𝑖=𝑡𝑘−1                                                                     (27)
+  𝑘−1  𝑘            ∑𝑡𝑘−1  𝑧(𝑖)
+                       𝑖=𝑡𝑘−1
+Here, 𝑡0 = 1, 𝑡𝑛+1 = 𝐿+ 1, 𝑡𝑖 denotes the                           𝑖th threshold, and 𝑧𝑖 denotes
+the number of 𝑖th pixels. The pixels of the original image in the interval
+[𝑡𝑘−1, 𝑡𝑘] can be calculated as 𝑢(𝑡𝑘−1, 𝑡𝑘) after solving for the thresholds.
+4.2.2. Algorithm comparison experiments on multilevel image segmentation                                  Fig. 11. Original and segmented Lena images obtained by artificial protozoa optimizer.
+                                        The performance of the APO was evaluated using multilevel image
+segmentation. A Lena color image of 512 ×       512 pixels was tested.
+Regarding the experimental parameter settings, 𝑝𝑠 was 100, the max-                                     the segmented Lena. Fig. 11 illustrates the original Lena image along
+imum number of iterations was 100, and the number of runs for the                                         with the five segmentation cases (2, 4, 6, 8, and 10 thresholds). Notice-
+algorithms was 31; for the remaining parameters, refer to Section 3.1.
+                                     Image segmentation is a discrete optimization method in which each   ably, the quality of the segmented images improves with an increase in
+candidate solution is rounded at each iteration for solving this problem.                                 the number of thresholds. We utilized three quantitative indicators to
+The colored Lena image contains three pixel channels: red, green, and                                     evaluate the segmented images: peak signal-to-noise ratio (PSNR) [92],
+blue. In each channel, the histogram information of the pixels was                                        structural similarity index (SSIM) [93], and feature similarity index
+used to solve the thresholds separately using the APO. Finally, the                                       (FSIM) [94–96]. The PSNR quantifies the peak error, SSIM evaluates
+segmentation results of the three channels were concatenated to obtain                                    structural similarity, and FSIM measures feature similarity. A higher
+                                                                         17
+---
+X. Wang et al.                                                                                            Knowledge-Based Systems 295 (2024) 111737
+Table 14
+Comparison of algorithms based on the peak signal-to-noise ratio, structured similarity index, and feature similarity index.
+ Threshold        APO            GSA           MVO           SCA           AOA           TLBO          SDO                                      SPO      SPBO
+                                                                           PSNR
+ 2                23.5625        23.5625       23.5625           23.5625   23.5625       23.5625                                       23.5625  23.5625  23.5625
+ 4                28.4418        28.3012       28.4418           28.4251   28.4418       28.4325                                       28.4418  28.4418  28.4418
+ 6                30.9630        30.3931       30.9804           30.7255   30.9693       30.9313                                       30.9572  30.9804  30.9842
+ 8                33.0393        32.2141       33.0292           32.4045   33.0256       32.8765                                       32.9946  33.0292  32.5281
+ 10               34.6564        33.4351       34.3325           33.7262   34.3368       34.0703                                       34.1887  34.3319  34.3698
+                                                                           SSIM
+ 2                0.8106         0.8106        0.8106        0.8106        0.8106        0.8106                                         0.8106  0.8106   0.8106
+ 4                0.8935         0.8884        0.8935        0.8938        0.8935        0.8936                                         0.8935  0.8935   0.8935
+ 6                0.9307         0.9252        0.9308        0.9255        0.9309        0.9304                                         0.9306  0.9308   0.9314
+ 8                0.9534         0.9456        0.9533        0.9439        0.9534        0.9513                                         0.9531  0.9533   0.9473
+ 10               0.9646         0.9559        0.9641        0.9565        0.9642        0.9621                                         0.9631  0.9641   0.9632
+                                                                           FSIM
+ 2                0.8440         0.8440        0.8440        0.8440        0.8440        0.8440                                         0.8440  0.8440   0.8440
+ 4                0.9155         0.9161        0.9155        0.9155        0.9155        0.9153                                         0.9155  0.9155   0.9155
+ 6                0.9585         0.9523        0.9584        0.9614        0.9580        0.9570                                         0.9575  0.9584   0.9588
+ 8                0.9728         0.9596        0.9727        0.9712        0.9727        0.9724                                         0.9725  0.9727   0.9702
+ 10               0.9826         0.9766        0.9790        0.9780        0.9789        0.9787                                         0.9783  0.9790   0.9803
+ Mean rank        1.33           8.67          2.67          7             4             7.33          6.67                                     3        4
+ Ranking          1              9             2             7             4             8             6                                        3        4
+ value of these three indicators implies that a better image quality has                                 enabling a comprehensive algorithm evaluation. Furthermore, consid-
+been segmented by the algorithms.                                                                        ering a practical application context, the proposed APO was used to
+   Table 14 lists the three best indicators obtained by using each algo-                                  address five engineering design and multilevel image segmentation
+ rithm. In this section, we present a comparative analysis of the second                                 problems. Ultimately, the experimental data confirmed that the pro-
+      half of the algorithms listed in Table 3 (physics- and human-based                                posed algorithm significantly surpasses the compared state-of-the-art
+   algorithms), highlighting the best results for each indicator in bold  algorithms.
+   font. For the two-threshold segmentation problem, the nine algorithms                       Despite the encouraging results, the algorithm introduced in this
+   have the same performance. This is because the two-dimensional search                                 study is still at a preliminary stage when solving diverse and com-
+  problem within the pixel interval [0–255] is relatively simple and the                                 plex optimization problems. The following optimization problems and
+    performance difference between the algorithms is not reflected. How-                                   performance improvements can be considered in the future. First,
+  ever, as the number of thresholds increases, the performance advantage                                  the proposed APO algorithm can be explored to solve binary, large-
+      of the proposed APO algorithm is presented. The experiment results                               scale, expensive, multi-objective, and multitask optimization problems.
+  illustrate that, in most cases, the proposed APO algorithm is superior                                 Second, several methods can be considered to enhance the performance
+           to GSA, MVO, SCA, AOA, TLBO, SDO, SPO, and SPBO. According to                                  of the algorithm, such as membrane computing, parallel algorithms,
+  the Friedman test, the overall ranking obtained by averaging the three                                  sampling techniques, clustering methods, and surrogate models. Fi-
+  indicators is as follows: APO ranks first, MVO ranks second, SPO ranks                               nally, investigating hybridization using other algorithms is a promising
+          third, followed by AOA and SPBO with the same performance, SDO  research direction.
+        ranks sixth, SCA ranks seventh, TLBO ranks eighth, and GSA ranks
+       ninth. Consequently, the proposed APO algorithm proves to be more  CRediT authorship contribution statement
+    effective than its counterparts on the multilevel image segmentation
+problem.
+                                                                            Xiaopeng Wang:                    Writing – original draft, Visualization, Software,
+5. Conclusion                                                                                           Methodology, Investigation, Conceptualization. Václav Snášel: Writing
+                                                                                                          – review & editing, Methodology, Investigation, Conceptualization.
+         This study aimed to solve engineering optimization problems and  Seyedali Mirjalili:                     Visualization, Methodology, Writing – review &
+  provide flexible usage for practitioners. In this study, we proposed a  editing. Jeng-Shyang Pan:                      Conceptualization, Methodology, Writing
+  new bio-inspired algorithm called artificial protozoa optimizer. It is                                 – review & editing. Lingping Kong: Visualization, Software, Method-
+     inspired by natural protozoa, and the developed mathematical models                                   ology, Data curation. Hisham A. Shehadeh: Software, Methodology,
+  mimic their survival behaviors, such as foraging, dormancy, and repro-  Data curation.
+     duction. It is worth mentioning that in the proposed APO algorithm,
+we introduced a mapping vector 𝑀𝑓       in the foraging behavior. This  Declaration of competing interest
+     parameter determines the proportion of dimensional crossover of the
+candidate solutions. It is designed with the idea that ‘‘the better can-                            The authors declare that they have no known competing finan-
+   didate solutions change less and the worse candidate solutions change  cial interests or personal relationships that could have appeared to
+  more.’’ This strategy, which favors exploitation for better candidates  influence the work reported in this paper.
+     and exploration for worse candidates, can be extended to the design
+       and improvement of metaheuristic algorithms. The effectiveness of  Data availability
+   the algorithm was validated through extensive experiments. Initially,
+          the proposed APO was tested using the CEC2022 benchmark, which
+       includes unimodal, multimodal, hybrid, and composition functions,    Data will be made available on request.
+                                                                     18
+---
+X. Wang et al.                                                                                                                             Knowledge-Based Systems 295 (2024) 111737
+Acknowledgments                                                                             [28]  A. Kaveh, S. Talatahari, N. Khodadadi, Stochastic paint optimizer: Theory and
+                                                                                                  application in civil engineering, Eng. Comput. (2020) 1–32.
+                         The authors gratefully acknowledge financial support CZ.02.01.01/  [29]  B. Das, V.    Mukherjee, D. Das,   Student psychology based optimization          algo-
+                            00/22-008/0004590 by the Czech Republic Ministry of Education,        rithm: A new population based optimization algorithm for solving optimization
+                        Youth, and Sports in the project‘‘Robotics and Advanced Industrial  [30]  problems, Adv. Eng. Softw. 146 (2020) 102804.
+                                                                                                  M. Dorigo, C. Blum, Ant colony optimization theory: A survey, Theoret. Comput.
+Production’’ (ROBOPROX).                                                                          Sci. 344 (2–3) (2005) 243–278.
+                                                                                            [31]  A.W. Mohamed, A.A. Hadi, A.K. Mohamed, Gaining-sharing knowledge based
+Appendix A. Supplementary data                                                                    algorithm for solving optimization problems: A novel nature-inspired algorithm,
+                                                                                                  Int. J. Mach. Learn. Cybern. 11 (7) (2020) 1501–1529.
+                        Supplementary material related to this article can be found online  [32]  J.O.  Agushaka,    A.E. Ezugwu,    L.    Abualigah, Dwarf mongoose         optimization
+at https://doi.org/10.1016/j.knosys.2024.111737.                                            [33]  algorithm, Comput. Methods Appl. Mech. Engrg. 391 (2022) 114570.
+                                                                                                  M. Abdel-Basset, R. Mohamed, M. Jameel, M. Abouhawwash, Nutcracker opti-
+                                                                                                  mizer: A novel nature-inspired metaheuristic algorithm for global optimization
+References                                                                                        and engineering design problems, Knowl.-Based Syst. 262 (2023) 110248.
+                                                                                            [34]  F.A. Hashim, A.G. Hussien, Snake optimizer: A novel meta-heuristic optimization
+  [1]  E. Osaba, E. Villar-Rodriguez, J.D. Ser, A.J. Nebro, D. Molina, A. LaTorre, P.N.           algorithm, Knowl.-Based Syst. 242 (2022) 108320.
+       Suganthan, C.A.C. Coello, F. Herrera, A tutorial on the design, experimentation      [35]  A.A. Heidari, S. Mirjalili, H. Faris, I. Aljarah, M. Mafarja, H. Chen, Harris hawks
+       and application of metaheuristic algorithms to real-world optimization problems,           optimization: Algorithm and applications, Fut. Gener. Comput. Syst. 97 (2019)
+       Swarm Evol. Comput. 64 (2021) 100888.                                                      849–872.
+  [2]  L. Abualigah, M.A. Elaziz, A.M. Khasawneh, M. Alshinwan, R.A. Ibrahim, M.A.          [36]  W. Zhao, L.        Wang, Z. Zhang,   S. Mirjalili,  N.  Khodadadi,   Q.  Ge,  Quadratic
+       Al-Qaness, S. Mirjalili, P. Sumari, A.H. Gandomi, Meta-heuristic optimization              Interpolation Optimization       (QIO):  A new optimization algorithm    based       on
+       algorithms for solving real-world mechanical engineering design problems: A                generalized quadratic interpolation and its applications to real-world engineering
+       comprehensive survey, applications, comparative analysis, and results, Neural              problems, Comput. Methods Appl. Mech. Engrg. 417 (2023) 116446.
+       Comput. Appl. (2022) 1–30.                                                           [37]  F.A.  Hashim,       R.R. Mostafa,  A.G.  Hussien,   S.  Mirjalili, K.M.  Sallam, Fick’s
+  [3]  J.S. Pan, P. Hu, V. Snášel, S.C. Chu, A survey on binary metaheuristic algorithms          law   algorithm:     A physical law-based algorithm     for numerical    optimization,
+       and their engineering applications, Artif. Intell. Rev. 56 (2023) 6101–6167.               Knowl.-Based Syst. 260 (2023) 110146.
+  [4]  Z.H. Zhan, L. Shi, K.C. Tan, J. Zhang, A survey on evolutionary computation for      [38]  A.E. Eiben, C.A. Schippers, On evolutionary exploration and exploitation, Fund.
+       complex continuous optimization, Artif. Intell. Rev. (2022) 1–52.                          Inform. 35 (1–4) (1998) 35–50.
+  [5]  A.G.  Gad,  Particle swarm optimization  algorithm  and  its applications:        A  [39]  D.H. Wolpert, W.G. Macready, No free lunch theorems for optimization, IEEE
+       systematic review, Arch. Comput. Methods Eng. 29 (5) (2022) 2531–2561.                     Trans. Evol. Comput. 1 (1) (1997) 67–82.
+  [6]  Z. Beheshti, S.M.H. Shamsuddin, A review of population-based meta-heuristic          [40]  J.J.  Wolken, Euglena:         An  Experimental     Organism  for Biochemical       and
+  [7]  algorithms, Int. J. Adv. Soft Comput. Appl 5 (1) (2013) 1–35.                              Biophysical Studies, Springer Science & Business Media, 2012.
+       E.G. Talbi, Metaheuristics: from Design to Implementation, John Wiley & Sons,        [41]  J.D.  Wehr,   R.G. Sheath, J.P.    Kociolek, Freshwater Algae of North         America:
+  [8]  2009.                                                                                      Ecology and Classification, Elsevier, 2015.
+       S. Kirkpatrick, C.D. Gelatt Jr., M.P. Vecchi, Optimization by simulated annealing,   [42]  A.Y. Kostygov, A. Karnkowska, J. Vot`
+       Science 220 (4598) (1983) 671–680.                                                                                                          ypka, D. Tashyreva, K. Maciszewski, V.
+  [9]  F. Glover, M. Laguna, Tabu Search, Springer, 1998.                                         Yurchenko, J. Lukeš, Euglenozoa: Taxonomy, diversity and ecology, symbioses
+ [10]  K.A. Sullivan, S.H. Jacobson, A convergence analysis of generalized hill climbing    [43]  and viruses, Open Biol. 11 (3) (2021) 200407.
+       algorithms, IEEE Trans. Automat. Control 46 (8) (2001) 1288–1293.                          Britannica, The Editors of Encyclopaedi, Euglena, 2023, https://www.britannica.
+ [11]  H.R. Lourenço, O.C. Martin, T. Stützle, Iterated Local Search, Springer, 2003.       [44]  com/science/Euglena.
+ [12]  N. Mladenović, P. Hansen, Variable neighborhood search, Comput. Oper. Res.           [45]  D.E. Buetow, The Biology Of Euglena, Academic Press, 2014.
+       24 (11) (1997) 1097–1100.                                                                  L. Barsanti, V. Evangelista, V. Passarelli, A.M. Frassanito, P. Gualtieri, Funda-
+ [13]  J.H.  Holland, Adaptation in Natural and Artificial Systems: An Introductory               mental questions and concepts about photoreception and the case of Euglena
+       Analysis with Applications to Biology, Control, and Artificial Intelligence, MIT           gracilis, Integr. Biol. 4 (1) (2012) 22–36.
+       Press, 1992.                                                                         [46]  S.D.  Schwartzbach, S. Shigeoka,   Euglena: Biochemistry, Cell and            Molecular
+ [14]  K. Price, R.M. Storn, J.A. Lampinen, Differential Evolution: A Practical Approach          Biology, vol. 979, Springer, 2017.
+       to Global Optimization, Springer Science & Business Media, 2006.                     [47]  F. Hindák,    K. Wolowski,     A.  Hindáková, Cysts and their formation  in some
+ [15]  K. Price, Genetic annealing, Dr. Dobb’s J. 19 (1994) 127–132.                              neustonic Euglena species, Ann. Limnol.-Int. J. Limnol. (2000) 83–93.
+ [16]  P.  Civicioglu, Backtracking search  optimization algorithm  for          numerical  [48]  K. Ozasa, H. Kang, S. Song, S. Tamaki, T. Shinomura, M. Maeda, Regeneration
+       optimization problems, Appl. Math. Comput. 219 (15) (2013) 8121–8144.                      of the eyespot and flagellum in Euglena gracilis during cell division, Plants 10
+ [17]  R. Rao, Jaya: A simple and new optimization algorithm for solving constrained              (10) (2021) 2004.
+       and unconstrained optimization problems, Int. J. Ind. Eng. Comput. 7 (1) (2016)      [49]  H.T.  Kahraman,    S. Aras,    E.  Gedikli, Fitness-Distance Balance (FDB): A       new
+       19–34.                                                                                     selection method for meta-heuristic search algorithms, Knowl.-Based Syst. 190
+ [18]  J.  Kennedy, R.   Eberhart, Particle swarm optimization,  in: Proceedings of               (2020) 105169.
+       ICNN’95-International Conference   on  Neural  Networks, vol. 4, 1995,          pp.  [50]  S. Duman, H.T. Kahraman, M. Kati, Economical operation of modern power grids
+       1942–1948.                                                                                 incorporating uncertainties of renewable energy sources and load demand using
+ [19]  S. Mirjalili, S.M. Mirjalili, A. Lewis, Grey wolf optimizer, Adv. Eng. Softw. 69           the adaptive fitness-distance balance-based stochastic fractal search algorithm,
+ [20]  (2014) 46–61.                                                                              Eng. Appl. Artif. Intell. 117 (2023) 105501.
+       S. Mirjalili, A. Lewis, The whale optimization algorithm, Adv. Eng. Softw. 95        [51]  B. Ozkaya, H.T. Kahraman, S. Duman, U. Guvenc, Fitness-Distance-Constraint
+ [21]  (2016) 51–67.                                                                              (FDC) based guide selection method for constrained optimization problems, Appl.
+       P.C.  Song, S.C.  Chu, J.S. Pan, H.M.  Yang, Simplified phasmatodea         popula-        Soft Comput. 144 (2023) 110479.
+       tion evolution algorithm for optimization, Complex Intell. Syst. 8 (4) (2022)        [52]  H.T. Kahraman, H. Bakir, S. Duman, M. Katı, S. Aras, U. Guvenc, Dynamic FDB
+ [22]  2749–2767.                                                                                 selection method and its application: modeling and optimizing of directional
+       E.  Rashedi,  H.  Nezamabadi-Pour, S.  Saryazdi, GSA: A gravitational        search        overcurrent relays coordination, Appl. Intell. (2022) 1–36.
+ [23]  algorithm, Inform. Sci. 179 (13) (2009) 2232–2248.                                   [53]  H.T. Kahraman, M. Katı, S. Aras, D.A. Taşci, Development of the Natural Survivor
+       S. Mirjalili, S.M. Mirjalili, A. Hatamlou, Multi-verse optimizer: A nature-inspired        Method (NSM) for designing an updating mechanism in metaheuristic search
+ [24]  algorithm for global optimization, Neural Comput. Appl. 27 (2016) 495–513.                 algorithms, Eng. Appl. Artif. Intell. 122 (2023) 106121.
+       S. Mirjalili, SCA: A sine cosine algorithm for solving optimization problems,        [54]  A. Kumar,    K.V.  Price,    A.W.  Mohamed, A.A.    Hadi, P.N. Suganthan,       Problem
+ [25]  Knowl.-Based Syst. 96 (2016) 120–133.                                                      Definitions  and   Evaluation      Criteria for the CEC 2022 Special     Session    and
+       L. Abualigah, A. Diabat, S. Mirjalili, M. Abd Elaziz, A.H. Gandomi, The arith-
+       metic optimization algorithm, Comput. Methods Appl. Mech. Engrg. 376 (2021)                Competition on Single Objective Bound Constrained Numerical Optimization,
+       113609.                                                                                    Technical Report, Nanyang Technological University, 2021.
+ [26]  R.V. Rao, V.J. Savsani, D. Vakharia, Teaching-learning-based optimization: A         [55]  L. Abualigah,   D. Yousri, M.        Abd  Elaziz, A.A.  Ewees, M.A. Al-Qaness,     A.H.
+       novel method for constrained mechanical design optimization problems, Comput.              Gandomi,    Aquila     optimizer:  A novel meta-heuristic optimization       algorithm,
+       Aided Des. 43 (3) (2011) 303–315.                                                          Comput. Ind. Eng. 157 (2021) 107250.
+ [27]  W.  Zhao, L. Wang,   Z. Zhang,  Supply-demand-based  optimization: A          novel  [56]  L. Wang, Q. Cao, Z. Zhang, S. Mirjalili, W. Zhao, Artificial rabbits optimization:
+       economics-inspired algorithm for global optimization, IEEE Access 7          (2019)        A new bio-inspired meta-heuristic algorithm for solving engineering optimization
+       73182–73206.                                                                               problems, Eng. Appl. Artif. Intell. 114 (2022) 105082.
+                                                                                    19
+---
+X. Wang et al.                                                                                                                             Knowledge-Based Systems 295 (2024) 111737
+ [57]  M. Dehghani,  Z.  Montazeri, E. Trojovská, P. Trojovsk`
+                                                              y, Coati        optimization  [75]  N. Chopra, M.M. Ansari, Golden jackal optimization: A novel nature-inspired
+       algorithm: A new bio-inspired metaheuristic algorithm for solving optimization             optimizer for engineering applications, Expert Syst. Appl. 198 (2022) 116924.
+       problems, Knowl.-Based Syst. 259 (2023) 110011.                                      [76]  G. Dhiman, V. Kumar, Spotted  hyena optimizer: A novel          bio-inspired based
+ [58]  S. Zhao, T. Zhang, S. Ma, M. Chen, Dandelion optimizer: A nature-inspired                  metaheuristic technique for engineering applications, Adv. Eng. Softw.         114
+       metaheuristic algorithm for engineering applications, Eng. Appl. Artif. Intell. 114        (2017) 48–70.
+       (2022) 105075.                                                                       [77]  C.A.C. Coello, Theoretical and numerical constraint-handling techniques used
+ [59]  W. Zhao, L. Wang, Z. Zhang, H. Fan, J. Zhang, S. Mirjalili, N. Khodadadi, Q. Cao,          with evolutionary algorithms: A survey of the state of the art, Comput. Methods
+       Electric EEL foraging optimization: A new bio-inspired optimizer for engineering           Appl. Mech. Engrg. 191 (11–12) (2002) 1245–1287.
+       applications, Expert Syst. Appl. 238 (2024) 122200.                                  [78]  O. Kramer, A review of constraint-handling techniques for evolution strategies,
+ [60]  X. Wang, S.-C. Chu, V. Snášel, H.A. Shehadeh, J.-S. Pan, Five phases algorithm:            Appl. Comput. Intell. Soft Comput. 2010 (2010) 1–19.
+       A novel meta-heuristic algorithm and its application on economic load dispatch       [79]  H.T. Öztürk, H.T. Kahraman, Meta-heuristic search algorithms in truss optimiza-
+       problem, J. Internet Technol. 24 (4) (2023) 837–848.                                       tion: Research on stability and complexity analyses, Appl. Soft Comput. 145
+ [61]  J.-S. Pan, L.-G. Zhang, R.-B. Wang, V. Snášel, S.-C. Chu, Gannet optimization              (2023) 110573.
+       algorithm: A new metaheuristic algorithm for solving engineering optimization        [80]  G. Archana, P.G. Angeline, S. Anbarasu, AD-EHS: Alzheimer’s disease severity
+       problems, Math. Comput. Simulation 202 (2022) 343–373.                                     detection using efficient hybrid image segmentation, Adv. Eng. Softw. 173 (2022)
+ [62]  M.H. Amiri,  N. Mehrabi  Hashjin, M.  Montazeri, S. Mirjalili, N.        Khodadadi,        103234.
+       Hippopotamus   optimization algorithm: A  novel nature-inspired        optimization  [81]  X. Wang, J.S. Pan, S.C. Chu, A parallel multi-verse optimizer for application in
+       algorithm, Sci. Rep. 14 (1) (2024) 5032.                                                   multilevel image segmentation, IEEE Access 8 (2020) 32018–32030.
+ [63]  B. Abdollahzadeh, F.S. Gharehchopogh, N. Khodadadi, S. Mirjalili, Mountain           [82]  Y. Cai, S. Mi, J. Yan, H. Peng, X. Luo, Q. Yang, J. Wang, An unsupervised
+       gazelle optimizer: A new nature-inspired  metaheuristic algorithm for        global        segmentation method based on dynamic threshold neural p systems for color
+       optimization problems, Adv. Eng. Softw. 174 (2022) 103282.                                 images, Inform. Sci. 587 (2022) 473–484.
+ [64]  A. Faramarzi, M. Heidarinejad, S. Mirjalili, A.H. Gandomi, Marine predators          [83]  S. Jamaludin, A.F.M. Ayob, M.F.A. Akhbar, A.A.I.M. Ali, M.M.H. Imran, S.M.
+       algorithm: A  nature-inspired metaheuristic, Expert Syst. Appl. 152          (2020)        Norzeli, S.B. Mohamed, Efficient, accurate and fast pupil segmentation         for
+       113377.                                                                                    pupillary boundary in iris recognition, Adv. Eng. Softw. 175 (2023) 103352.
+ [65]  Z. Meng, J.-S. Pan, H. Xu, QUasi-Affine TRansformation Evolutionary (QUA-            [84]  P.K. Sahoo, G. Arora, A thresholding method based on two-dimensional Renyi’s
+       TRE) algorithm: A cooperative swarm based algorithm for global optimization,               entropy, Pattern Recognit. 37 (6) (2004) 1149–1161.
+       Knowl.-Based Syst. 109 (2016) 104–121.                                               [85]  F. Nie, P. Zhang, J. Li, D. Ding, A novel generalized entropy and its application
+ [66]  L. Abualigah, M. Abd Elaziz, P. Sumari, Z.W. Geem, A.H. Gandomi, Reptile                   in image thresholding, Signal Process. 134 (2017) 23–34.
+       Search Algorithm (RSA): A nature-inspired meta-heuristic optimizer, Expert Syst.     [86]  M.P. De Albuquerque, I.A. Esquef, A.G. Mello, Image thresholding using Tsallis
+       Appl. 191 (2022) 116158.                                                                   entropy, Pattern Recognit. Lett. 25 (9) (2004) 1059–1065.
+ [67]  S. Zhao, T. Zhang, S. Ma, M. Wang, Sea-horse optimizer: A novel nature-inspired      [87]  J.N. Kapur, P.K. Sahoo, A.K.  Wong, A  new  method  for gray-level         picture
+       meta-heuristic for global optimization problems, Appl. Intell. 53 (10) (2023)              thresholding using the entropy of the histogram, Comput. Vis. Graph. Image
+       11833–11860.                                                                               Process. 29 (3) (1985) 273–285.
+ [68]  S. Li, H. Chen, M. Wang, A.A. Heidari, S. Mirjalili, Slime mould algorithm: A        [88]  C. Li, P.K. Tam, An iterative algorithm for minimum cross entropy thresholding,
+       new method for stochastic optimization, Fut. Gener. Comput. Syst. 111 (2020)               Pattern Recognit. Lett. 19 (8) (1998) 771–776.
+       300–323.                                                                             [89]  P.Y. Yin, Multilevel minimum cross entropy threshold selection based on particle
+ [69]  S. Kaur, L.K. Awasthi, A.L. Sangal, G. Dhiman, Tunicate swarm algorithm: A new             swarm optimization, Appl. Math. Comput. 184 (2) (2007) 503–513.
+       bio-inspired based metaheuristic paradigm for global optimization, Eng. Appl.        [90]  P. Kandhway, A.K. Bhandari,   Spatial  context cross entropy function        based
+       Artif. Intell. 90 (2020) 103541.                                                           multilevel image segmentation using multi-verse optimizer, Multimedia Tools
+ [70]  E. Trojovská, M. Dehghani, P. Trojovsk`
+                                                    y, Zebra optimization algorithm: A new        Appl. 78 (16) (2019) 22613–22641.
+       bio-inspired optimization algorithm for solving optimization algorithm,        IEEE  [91]  S. Kullback, Information Theory and Statistics, Courier Corporation, 1997.
+       Access 10 (2022) 49445–49473.                                                        [92]  Z. Wang, A.C. Bovik, H.R. Sheikh, E.P. Simoncelli, Image quality assessment:
+ [71]  J. Derrac, S. García, D. Molina, F. Herrera, A practical tutorial on the use of            From error visibility to structural similarity, IEEE Trans. Image Process. 13 (4)
+       nonparametric statistical tests as a methodology for comparing evolutionary and            (2004) 600–612.
+       swarm intelligence algorithms, Swarm Evol. Comput. 1 (1) (2011) 3–18.                [93]  P. Ndajah, H. Kikuchi, M. Yukawa, H. Watanabe, S. Muramatsu, SSIM image
+ [72]  S. Cheng, Y. Shi, Q. Qin, Q. Zhang, R. Bai, Population diversity maintenance               quality metric for denoised images, in: International Conference on Visualization,
+       in brain storm optimization algorithm, J. Artif. Intell. Soft Comput. Res. 4 (2)           Imaging and Simulation, 2010, pp. 53–58.
+       (2014) 83–97.                                                                        [94]  L. Zhang, L. Zhang, X. Mou, D. Zhang, FSIM: A feature similarity index for image
+ [73]  K. Hussain, M.N.M. Salleh, S. Cheng, Y. Shi, On the exploration and exploitation           quality assessment, IEEE Trans. Image Process. 20 (8) (2011) 2378–2386.
+       in popular swarm-based  metaheuristic  algorithms, Neural Comput.  Appl.         31  [95]  D.M. Chandler, Seven challenges in image quality assessment: Past, present, and
+       (2019) 7665–7683.                                                                          future research, Int. Sch. Res. Not. 2013 (2013).
+ [74]  S. Mirjalili, Moth-flame optimization algorithm: A novel nature-inspired heuristic   [96]  H.R. Sheikh, M.F. Sabir, A.C. Bovik,   A statistical evaluation of recent     full
+       paradigm, Knowl.-Based Syst. 89 (2015) 228–249.                                            reference image quality assessment algorithms, IEEE Trans. Image Process. 15
+                                                                                                  (11) (2006) 3440–3451.
+                                                                                     20
