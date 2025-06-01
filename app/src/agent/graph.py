@@ -29,7 +29,7 @@ class Configuration(TypedDict):
     pdf_url: str
 
 # Define constants for N and K
-N_LOOPS = 9
+N_LOOPS = 8
 K_INTERVAL = 3
 
 # Define the graph with custom checkpoint saver

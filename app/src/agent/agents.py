@@ -16,8 +16,9 @@ from langgraph.graph.message import add_messages
 import google.generativeai as genai
 from agent.create_chain import create_cached_chain, create_agent_chain_with_tools, create_agent_chain
 from agent.prompts import STUDENT_AGENT_PROMPT, TEACHER_AGENT_PROMPT, OBSERVER_AGENT_PROMPT
-from agent.tools import arxiv_tools, graphiti_create_entities, graphiti_add_observations, parse_pdf_from_url
-
+from agent.tools import arxiv_tools, graphiti_create_entities, graphiti_add_observations, parse_pdf_from_url, extract_pdf_from_url
+import re
+import json
 
 
 gemini_llm = ChatGoogleGenerativeAI(
@@ -36,7 +37,7 @@ class AgentState(TypedDict):
     Represents the state of the agent graph.
     """
     messages: list[Any]
-    arxiv_paper_url: str = "https://arxiv.org/pdf/2505.03512"
+    arxiv_paper_url: str
     arxiv_paper: str
     questions_list: List[str]
     current_turn: int = 0
@@ -51,7 +52,10 @@ class AgentState(TypedDict):
 
 
 def init_node(state: AgentState, config: RunnableConfig):
-    pdf_text = open("pdf.txt", "r").read()
+
+    arxiv_paper_url = state.get("arxiv_paper_url")
+    arxiv_paper = extract_pdf_from_url(arxiv_paper_url)
+    
     
     try:
         student_chain = create_agent_chain(gemini_llm, STUDENT_AGENT_PROMPT)
@@ -63,7 +67,7 @@ def init_node(state: AgentState, config: RunnableConfig):
         }
 
     return {
-        "arxiv_paper": pdf_text,
+        "arxiv_paper": arxiv_paper,
         "current_turn": 0,
         "student_chain": student_chain,
         "teacher_chain": teacher_chain,
@@ -79,31 +83,98 @@ def student_node(state: AgentState, config: RunnableConfig):
     observer_insights = state.get("observer_insights", [])
     questions_list = state.get("questions_list", [])
     student_chain = state.get("student_chain")
+    arxiv_paper = state.get("arxiv_paper")
     print(f"Student: Current turn: {current_turn}")
 
     input_message = ""
 
     if current_turn == 0:
 
-        initial_questions = ["""
-        How does the proposed algorithm represent candidate solutions to the problem, and what are the implications of this representation scheme?
-        What are the specific search operators (e.g., initialization, selection, crossover, mutation, local search) employed by the algorithm, and how do they interact to guide the search process?
-        Can you detail the algorithm's strategy for balancing exploration and exploitation, and are there any adaptive mechanisms involved in this process?
-        What are the termination criteria for the proposed algorithm, and how sensitive is its performance to the setting of its various parameters as discussed by the authors?
-        """]
+        prompt = f"""You are question generator for arxiv paper. Generate 6 questions for this paper which content text is below.
+                Your questions are responded from experts. You use paper abstract to generate questions.
+                Your generated questions cover main points of paper. 
+                Dont generate simple questions like "What is this paper about?" or "What is the main contribution of this paper?". 
+                Your generated questions are used in phd research. Questions must be creative and reveal deep insights of paper. 
+                Your response format is json and dont include any other text. Your responses are directly parsed as json.
+                
+                #Question Model Format#
+                Every question item has title, prompt, category.
+                title: short format of question title
+                prompt: Question has 50 words max. Prompt has include questions and be formatted as modern llm prompt engineering rules.
+                category: One single word to categorize the questions. Category keyword reflects the type of question.
+                #End Question Model Format#
 
 
-        input_message = f"""
-        <Questions>
-        <Question>{initial_questions[0]}</Question>
-        </Questions>
-        """
 
-        
+
+                #Response Format#
+                [
+                    
+                    title: "Explain a research papcontenter",
+                    prompt: "Can you explain the key findings and methodology of this research paper?",
+                    category: "research",
+                
+                
+                    title: "Explain limitations",
+                    prompt: "What are the limitations or potential weaknesses of the approach described in this paper?",
+                    category: "critique",
+                    
+                
+                    title: "Compare with other papers",
+                    prompt: "How does this paper compare to other recent work in the same field?",
+                    category: "analysis",
+                
+                ]
+                #End Response Format#
+
+
+
+
+                #Negative Prompt for Response#
+                Dont add introdutory wordings. Follow below templates:
+                <Comparative Response>
+                    <Bad Response>
+                    The study compares brute force TSK, cascading GFT, and FCM-based approaches. 
+                    What are the trade-offs in terms of accuracy, complexity, and interpretability between these three GFS strategies when applied to the Airfoil Self Noise dataset?
+                    </Bad Response>
+                    <Good Response>
+                    What are the trade-offs in terms of accuracy, complexity, and interpretability between these three GFS strategies when applied to the Airfoil Self Noise dataset?
+                    </Good Response>
+                </Comparative Response>
+                <Comparative Response>
+                    <Bad Response>
+                    The paper explores three GFS strategies. What are the trade-offs in terms of explainability, computational cost, and predictive accuracy between brute force TSK, cascading GFT, and FCM-based approaches, especially considering their application to the Airfoil Self Noise dataset?
+                    </Bad Response>
+                    <Good Response>
+                    What are the trade-offs in terms of explainability, computational cost, and predictive accuracy between brute force TSK, cascading GFT, and FCM-based approaches, especially considering their application to the Airfoil Self Noise dataset?
+                    </Good Response>
+                </Comparative Response>
+                #End Negative Prompt for Response#
+                
+
+
+                #Paper Content Text#
+                {arxiv_paper}
+                #End Paper Content Text#
+                """
+        first_questions_response = student_chain.invoke({"input": prompt})
+
+        cleaned = re.sub(r'^```json\s*', '', first_questions_response.content, flags=re.IGNORECASE)  # Remove ```json at the start
+        cleaned = re.sub(r'```$', '', cleaned)  # Remove ``` at the end
+        cleaned = cleaned.strip()
+
+        questions_list = json.loads(cleaned)
+
+        question_string_template = f"""<Questions>
+        {"\n".join([f"<Question>{question['prompt']}</Question>" for question in questions_list])}
+        </Questions>"""
+
+        print("question_string_template", question_string_template)
+
         return {
-        "messages": messages + [HumanMessage(content=input_message, name="Student")],
+        "messages": messages + [HumanMessage(content=question_string_template, name="Student")],
         "current_turn": current_turn + 1,
-        "questions_list": questions_list + initial_questions
+        "questions_list": questions_list
         }
 
 
@@ -265,16 +336,6 @@ def observer_node(state: AgentState, config: RunnableConfig):
             "error": str(e)
         }
 
-
-    try:
-        graphiti_add_observations.invoke({
-            "observations": [{
-                "entityName": f"Conversation_Turn_{current_turn}",
-                "contents": [f"Observer insight: {observer_response['output']}"]
-            }]
-        })
-    except Exception as e:
-        print(f"Observer: Error storing in Graphiti: {e}")
 
     return {
         "messages": messages + [AIMessage(content=observer_response.content, name="Observer")],

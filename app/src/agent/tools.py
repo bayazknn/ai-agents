@@ -9,6 +9,11 @@ load_dotenv()
 from langchain_community.tools import WikipediaQueryRun, TavilySearchResults
 from langchain_community.utilities import WikipediaAPIWrapper
 from langchain_core.tools import tool
+import pdfplumber
+from io import BytesIO
+import time
+import pymupdf4llm
+import pymupdf
 
 # Initialize Wikipedia Tool
 wikipedia = WikipediaQueryRun(api_wrapper=WikipediaAPIWrapper())
@@ -16,8 +21,33 @@ wikipedia = WikipediaQueryRun(api_wrapper=WikipediaAPIWrapper())
 # Initialize Tavily Tool
 tavily = TavilySearchResults(max_results=5)
 
+
+
+def extract_pdf_from_url(url: str) -> str:
+    """
+    Downloads a PDF from the given URL and extracts its text content.
+    Args:
+        url: The URL of the PDF file.
+    Returns:
+        The extracted text content of the PDF.
+    """
+    print(f"Fetching PDF from URL started: {url}")
+    start_time = time.time()
+    response = requests.get(url)
+    response.raise_for_status()
+    pdf_bytes = BytesIO(response.content)
+    end_time = time.time()
+    print(f"Fetching PDF from URL finished: {url} in {end_time - start_time:.2f} seconds")
+    doc = pymupdf.open(stream=pdf_bytes, filetype="pdf")
+    markdown_text = pymupdf4llm.to_markdown(doc)
+    return markdown_text
+
+
+
+    
+
 @tool
-def parse_pdf_from_url(pdf_url: str) -> str:
+def parse_pdf_from_url(pdf_url: str, file_path: str) -> str:
     """
     Downloads a PDF from the given URL and extracts its text content.
     Args:
@@ -26,15 +56,24 @@ def parse_pdf_from_url(pdf_url: str) -> str:
         The extracted text content of the PDF.
     """
     try:
-        response = requests.get(pdf_url)
-        response.raise_for_status() # Raise an exception for HTTP errors
+        if pdf_url:
+            response = requests.get(pdf_url)
+            response.raise_for_status() # Raise an exception for HTTP errors
+            with io.BytesIO(response.content) as pdf_file:
+                reader = PyPDF2.PdfReader(pdf_file)
+                text = ""
+                for page_num in range(len(reader.pages)):
+                    text += reader.pages[page_num].extract_text()
+                return text
+        else:
+            with open(file_path, "rb") as f:
+                reader = PyPDF2.PdfReader(f)
+                text = ""
+                for page_num in range(len(reader.pages)):
+                    text += reader.pages[page_num].extract_text()
+                return text
         
-        with io.BytesIO(response.content) as pdf_file:
-            reader = PyPDF2.PdfReader(pdf_file)
-            text = ""
-            for page_num in range(len(reader.pages)):
-                text += reader.pages[page_num].extract_text()
-            return text
+
     except Exception as e:
         return f"Error parsing PDF from URL {pdf_url}: {e}"
 
